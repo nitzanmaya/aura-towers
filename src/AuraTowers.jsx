@@ -183,8 +183,8 @@ function TrustBadge({ size = 148 }) {
 
 /* ---------- Hero showcase: architectural photo + interactive hotspots ---------- */
 
-// Free-license photo from Freepik (attribution shown on the image). Swap for the project's own renders.
-const HERO_PHOTO = "https://img.magnific.com/free-photo/vertical-glass-building-with-white-balconies-blue-sky_181624-6492.jpg?w=1200";
+// Unsplash photo by Allen Y (Unsplash License, hotlinked as Unsplash asks). Swap for the project's own renders.
+const HERO_PHOTO = "https://images.unsplash.com/photo-1762758731316-419c3c283ed9?auto=format&fit=crop&w=1100&h=1375&q=80";
 
 const HOTSPOTS = [
   { id: "ph", label: "פנטהאוז זמין", x: 62, y: 16, unit: "N-3401", note: "גג פרטי של 95 מ״ר עם ג׳קוזי ומטבח חוץ" },
@@ -294,7 +294,7 @@ function HeroShowcase({ onPick }) {
         {photo && (
           <img
             src={HERO_PHOTO}
-            alt="מגדל מגורים עם חזית זכוכית ומרפסות לבנות על רקע שמיים כחולים"
+            alt="מגדל מגורים מודרני עם מרפסות על רקע שמיים כחולים"
             className="aura-kenburns absolute inset-0 h-full w-full object-cover"
             loading="eager"
             fetchpriority="high"
@@ -312,10 +312,10 @@ function HeroShowcase({ onPick }) {
         ))}
 
         <figcaption className="absolute bottom-3 right-4 text-[10px] tracking-wide text-white/75">
-          {photo ? "צילום: Freepik · להמחשה בלבד" : "הדמיה להמחשה בלבד"}
+          {photo ? "צילום: Allen Y / Unsplash · להמחשה בלבד" : "הדמיה להמחשה בלבד"}
         </figcaption>
       </figure>
-      <div className="absolute -left-2 -top-8 origin-top-left scale-75 sm:-left-10 sm:-top-10 sm:scale-100">
+      <div className="absolute left-1 -top-8 origin-top-left scale-75 sm:-left-5 sm:-top-10 sm:scale-100">
         <TrustBadge size={132} />
       </div>
     </div>
