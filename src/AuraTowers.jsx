@@ -3,6 +3,7 @@ import {
   Accessibility,
   Award,
   BedDouble,
+  CalendarCheck,
   Building2,
   Car,
   Check,
@@ -453,7 +454,7 @@ function HeroShowcase({ onPick }) {
 
 /* ---------- Unit finder ---------- */
 
-function UnitFinder({ onPick }) {
+function UnitFinder({ onPick, onReserve }) {
   const [rooms, setRooms] = useState("all");
   const [budget, setBudget] = useState(7_000_000);
 
@@ -521,6 +522,9 @@ function UnitFinder({ onPick }) {
           <div className="mt-6 rounded-[24px] border border-dashed border-[#DDD6CB] bg-white/60 p-10 text-center">
             <p className="text-lg font-semibold text-[#2B3138]">אין דירה זמינה בטווח הזה</p>
             <p className="mt-2 text-[#6B6760]">הגדילו את התקציב או בחרו מספר חדרים אחר.</p>
+            <a href="#quiz" className={`${ctaClass} mt-6`}>
+              ספרו לנו מה אתם מחפשים <ChevronLeft className="h-4 w-4" />
+            </a>
           </div>
         ) : (
           <ul className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -572,15 +576,22 @@ function UnitFinder({ onPick }) {
                   <Compass className="h-4 w-4 text-[#9A7B4F]" /> כיוון: {u.view}
                 </p>
 
-                <div className="mt-auto flex items-end justify-between gap-3 pt-6">
-                  <div>
-                    <p className="text-[12px] text-[#6B6760]">החל מ־</p>
-                    <p className="text-2xl font-bold tabular-nums text-[#0F1B2D]">{nis(u.price)}</p>
-                  </div>
+                <div className="mt-auto pt-6">
+                  <p className="text-[12px] text-[#6B6760]">החל מ־</p>
+                  <p className="text-2xl font-bold tabular-nums text-[#0F1B2D]">{nis(u.price)}</p>
+                </div>
+                <div className="mt-4 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onReserve(u)}
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-full bg-[#0F1B2D] px-4 py-2.5 text-[14px] font-bold text-white transition hover:bg-[#3A4A5E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9A7B4F]"
+                  >
+                    <CalendarCheck className="h-4 w-4" /> תיאום ביקור
+                  </button>
                   <button
                     type="button"
                     onClick={() => onPick(u)}
-                    className="inline-flex items-center gap-1 rounded-full px-3 py-2 text-[14px] font-semibold text-[#0F1B2D] transition hover:bg-[#F7F5F1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#9A7B4F]"
+                    className="inline-flex items-center gap-1 rounded-full px-3 py-2.5 text-[14px] font-semibold text-[#0F1B2D] transition hover:bg-[#F7F5F1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#9A7B4F]"
                   >
                     חשבו משכנתא <ChevronLeft className="h-4 w-4 transition group-hover:-translate-x-0.5" />
                   </button>
@@ -768,6 +779,12 @@ function MortgageCalculator({ price, setPrice }) {
               <div>
                 <p className="text-[14px] text-[#6B6760]">החזר חודשי משוער</p>
                 <p className="mt-1 text-4xl font-bold tabular-nums text-[#0F1B2D] sm:text-5xl">{nis(m.monthly)}</p>
+                <a
+                  href="#quiz"
+                  className="mt-3 inline-flex items-center gap-1 text-[14px] font-bold text-[#7A5F38] underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#9A7B4F]"
+                >
+                  קבלו הצעה עם תנאי מימון מהיזם <ChevronLeft className="h-4 w-4" />
+                </a>
               </div>
               <dl className="grid grid-cols-3 gap-5 text-[14px]">
                 <div>
@@ -1449,6 +1466,52 @@ function CookieBanner({ open, settingsFirst, onDone, onPrivacy }) {
 
 /* ---------- Page ---------- */
 
+/* ---------- Sticky phone CTA ---------- */
+
+// Phone-only bar that appears after the hero and steps aside while the quiz is on screen.
+function StickyCta() {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const hero = document.getElementById("top");
+    const quiz = document.getElementById("quiz");
+    if (!hero || !quiz) return undefined;
+    const seen = { hero: true, quiz: false };
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => (seen[e.target === hero ? "hero" : "quiz"] = e.isIntersecting));
+      setShow(!seen.hero && !seen.quiz);
+    });
+    io.observe(hero);
+    io.observe(quiz);
+    return () => io.disconnect();
+  }, []);
+
+  return (
+    <div
+      className={`fixed bottom-4 left-[84px] right-4 z-50 flex gap-2 transition duration-300 md:hidden ${
+        show ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-6 opacity-0"
+      }`}
+      aria-hidden={!show}
+    >
+      <a
+        href="#quiz"
+        tabIndex={show ? 0 : -1}
+        className="flex h-14 flex-1 items-center justify-center gap-2 rounded-full bg-[#0F1B2D] text-[15px] font-bold text-white shadow-[0_16px_40px_-12px_rgba(15,27,45,0.7)] ring-1 ring-[#9A7B4F]/40"
+      >
+        <CalendarCheck className="h-4 w-4" /> תיאום פגישה
+      </a>
+      <a
+        href="tel:*5520"
+        tabIndex={show ? 0 : -1}
+        aria-label="חיוג למשרד המכירות"
+        className="flex h-14 w-14 items-center justify-center rounded-full border border-[#DDD6CB] bg-white text-[#0F1B2D] shadow-[0_16px_40px_-12px_rgba(15,27,45,0.5)]"
+      >
+        <Phone className="h-5 w-5" />
+      </a>
+    </div>
+  );
+}
+
 export default function AuraTowers() {
   const [menu, setMenu] = useState(false);
   const [price, setPrice] = useState(4_850_000);
@@ -1470,6 +1533,11 @@ export default function AuraTowers() {
     setPrice(u.price);
     setPickedRooms(u.rooms);
     document.getElementById("mortgage")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const reserveUnit = (u) => {
+    setPickedRooms(u.rooms);
+    requestAnimationFrame(() => document.getElementById("quiz")?.scrollIntoView({ behavior: "smooth" }));
   };
 
   const nav = [
@@ -1670,7 +1738,7 @@ export default function AuraTowers() {
         </ul>
       </div>
 
-      <UnitFinder onPick={pickUnit} />
+      <UnitFinder onPick={pickUnit} onReserve={reserveUnit} />
       <MortgageCalculator price={price} setPrice={setPrice} />
 
       {/* Architectural word band, slides sideways with scroll */}
@@ -1700,6 +1768,39 @@ export default function AuraTowers() {
               </li>
             ))}
           </ul>
+        </div>
+      </section>
+
+      {/* Conversion band */}
+      <section aria-labelledby="cta-band" className="px-4 pb-20 sm:px-8 lg:pb-28">
+        <div data-reveal className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] bg-gradient-to-l from-[#0F1B2D] to-[#2B3A4E] px-6 py-12 text-white sm:px-12 sm:py-14">
+          <div aria-hidden="true" className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full border border-[#C9A86E]/25" />
+          <div aria-hidden="true" className="pointer-events-none absolute -left-10 -top-10 h-44 w-44 rounded-full border border-[#C9A86E]/20" />
+          <div className="relative flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+            <div className="max-w-xl">
+              <p className="text-[13px] font-semibold uppercase tracking-[0.18em] text-[#C9A86E]">מכירה מוקדמת · שלב א׳</p>
+              <h2 id="cta-band" className="mt-3 text-3xl font-bold leading-tight [text-wrap:balance] sm:text-4xl">
+                הדירות בקומות הגבוהות נמכרות ראשונות
+              </h2>
+              <p className="mt-3 text-lg font-light text-[#C9CDD3]">
+                קבעו סיור פרטי בדירה לדוגמה וקבלו מחירון מוקדם לפני פתיחת השלב הבא.
+              </p>
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <a
+                href="#quiz"
+                className="aura-shine inline-flex items-center justify-center gap-2 rounded-full bg-[#F7F5F1] px-7 py-3.5 text-[15px] font-bold text-[#0F1B2D] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] transition hover:-translate-y-0.5 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A86E]"
+              >
+                <CalendarCheck className="h-4 w-4" /> תיאום סיור פרטי
+              </a>
+              <a
+                href="tel:*5520"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 px-6 py-3.5 text-[15px] font-semibold text-white transition hover:border-white/60 hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A86E]"
+              >
+                <Phone className="h-4 w-4" /> <bdi dir="ltr" className="tabular-nums">&#x2066;*5520&#x2069;</bdi>
+              </a>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -1756,6 +1857,7 @@ export default function AuraTowers() {
       </footer>
       </div>
 
+      <StickyCta />
       <A11yWidget prefs={a11y} setPrefs={setA11y} onStatement={() => setLegal("a11y")} />
       <CookieBanner
         open={cookie.open}
