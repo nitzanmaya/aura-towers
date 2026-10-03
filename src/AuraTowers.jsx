@@ -1537,6 +1537,7 @@ export default function AuraTowers() {
         .aura.motion .aura-gold { animation: aura-gold 7s ease-in-out infinite; }
         @keyframes aura-gold { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
         .aura-outline { color: transparent; -webkit-text-stroke: 1px rgba(15,27,45,.28); }
+        .aura-outline-soft { -webkit-text-stroke-color: rgba(154,123,79,.38); }
         .aura-tilt { transform-style: preserve-3d; transition: transform .6s cubic-bezier(.16,1,.3,1); will-change: transform; }
         .aura-glare { opacity: 0; transition: opacity .4s; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255,246,228,.35), transparent 45%); }
         .aura.motion .aura-tilt:hover .aura-glare { opacity: 1; }
@@ -1599,8 +1600,15 @@ export default function AuraTowers() {
         )}
       </header>
 
+      {/* Brand band under the header, drifts sideways with scroll */}
+      <div aria-hidden="true" className="pointer-events-none select-none overflow-hidden pt-6 sm:pt-8">
+        <p data-drift="-0.5" dir="ltr" className="aura-outline aura-outline-soft whitespace-nowrap text-[52px] font-extrabold leading-none tracking-[0.08em] sm:text-[96px]">
+          AURA TOWERS · HERZLIYA PITUACH · AURA TOWERS · HERZLIYA PITUACH · AURA TOWERS
+        </p>
+      </div>
+
       {/* Hero */}
-      <section id="top" className="px-4 pb-16 pt-12 sm:px-8 lg:pb-24 lg:pt-20">
+      <section id="top" className="px-4 pb-16 pt-6 sm:px-8 lg:pb-24 lg:pt-10">
         <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
           <div>
             <p className="flex items-center gap-2 text-[14px] font-medium text-[#6B6760]">
