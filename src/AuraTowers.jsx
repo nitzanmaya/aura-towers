@@ -92,7 +92,7 @@ function Eyebrow({ children }) {
 
 function SectionTitle({ eyebrow, title, text }) {
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-2xl" data-reveal>
       <Eyebrow>{eyebrow}</Eyebrow>
       <h2 className="text-3xl font-bold leading-tight text-[#0F1B2D] [text-wrap:balance] sm:text-4xl">{title}</h2>
       {text && <p className="mt-4 text-lg font-light leading-relaxed text-[#6B6760]">{text}</p>}
@@ -142,6 +142,127 @@ function savePref(key, value) {
   } catch {
     /* storage unavailable */
   }
+}
+
+/* ---------- Motion: reveals, parallax, tilt ---------- */
+
+// Turns on scroll-linked motion unless the visitor prefers reduced motion or switched animations off.
+function useMotionFX(rootRef, enabled) {
+  const [on, setOn] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setOn(enabled && !mq.matches);
+    update();
+    mq.addEventListener?.("change", update);
+    return () => mq.removeEventListener?.("change", update);
+  }, [enabled]);
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return undefined;
+    const layers = [...root.querySelectorAll("[data-parallax], [data-drift]")];
+    if (!on) {
+      layers.forEach((el) => (el.style.transform = ""));
+      return undefined;
+    }
+
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("is-in");
+            io.unobserve(e.target);
+          }
+        }),
+      { rootMargin: "0px 0px -12% 0px", threshold: 0.12 }
+    );
+    root.querySelectorAll("[data-reveal]:not(.is-in)").forEach((el) => io.observe(el));
+
+    let frame = 0;
+    const paint = () => {
+      frame = 0;
+      const vh = window.innerHeight;
+      const max = document.documentElement.scrollHeight - vh;
+      root.style.setProperty("--sp", max > 0 ? (window.scrollY / max).toFixed(4) : "0");
+      layers.forEach((el) => {
+        if (!el.isConnected) return;
+        const r = el.parentElement.getBoundingClientRect();
+        if (r.bottom < -200 || r.top > vh + 200) return;
+        const offset = r.top + r.height / 2 - vh / 2;
+        if (el.dataset.drift) el.style.transform = `translate3d(${(offset * Number(el.dataset.drift)).toFixed(1)}px,0,0)`;
+        else el.style.transform = `translate3d(0,${(offset * Number(el.dataset.parallax)).toFixed(1)}px,0)`;
+      });
+    };
+    const onScroll = () => !frame && (frame = requestAnimationFrame(paint));
+    paint();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+
+    // Pointer tilt on the hero image (mouse and trackpad only)
+    const tilt = root.querySelector("[data-tilt]");
+    const fine = window.matchMedia("(pointer: fine)").matches;
+    const onMove = (e) => {
+      const r = tilt.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width;
+      const py = (e.clientY - r.top) / r.height;
+      tilt.style.transform = `rotateY(${((px - 0.5) * 7).toFixed(2)}deg) rotateX(${((0.5 - py) * 6).toFixed(2)}deg)`;
+      tilt.style.setProperty("--gx", `${(px * 100).toFixed(1)}%`);
+      tilt.style.setProperty("--gy", `${(py * 100).toFixed(1)}%`);
+    };
+    const onLeave = () => (tilt.style.transform = "");
+    if (tilt && fine) {
+      tilt.addEventListener("pointermove", onMove);
+      tilt.addEventListener("pointerleave", onLeave);
+    }
+
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (tilt) {
+        tilt.removeEventListener("pointermove", onMove);
+        tilt.removeEventListener("pointerleave", onLeave);
+        tilt.style.transform = "";
+      }
+      layers.forEach((el) => (el.style.transform = ""));
+    };
+  }, [on, rootRef]);
+
+  return on;
+}
+
+// Counts up to `to` once the number scrolls into view; shows the final value without motion.
+function CountUp({ to, active, duration = 1600 }) {
+  const ref = useRef(null);
+  const [n, setN] = useState(to);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !active) return undefined;
+    let raf = 0;
+    setN(0);
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const start = performance.now();
+      const step = (t) => {
+        const k = Math.min(1, (t - start) / duration);
+        setN(Math.round(to * (1 - Math.pow(1 - k, 4))));
+        if (k < 1) raf = requestAnimationFrame(step);
+      };
+      raf = requestAnimationFrame(step);
+    });
+    io.observe(el);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+      setN(to);
+    };
+  }, [to, active, duration]);
+
+  return <span ref={ref}>{n}</span>;
 }
 
 /* ---------- Rotating seal ---------- */
@@ -288,10 +409,14 @@ function HeroShowcase({ onPick }) {
   };
 
   return (
-    <div ref={ref} className="relative mx-auto w-full max-w-[480px]">
-      <figure className="relative aspect-[4/5] w-full max-w-full overflow-hidden rounded-[32px] border border-stone-200/50 bg-[#D9D2C6] shadow-[0_40px_90px_-45px_rgba(15,27,45,0.6)]">
+    <div ref={ref} data-intro style={{ "--d": 2 }} className="relative mx-auto w-full max-w-[480px] [perspective:1200px]">
+      <div className="pointer-events-none absolute -bottom-8 -right-4 h-40 w-40 sm:-right-10" aria-hidden="true">
+        <div data-parallax="0.1" className="h-full w-full rounded-[28px] border border-[#9A7B4F]/45" />
+      </div>
+      <figure data-tilt className="aura-tilt relative aspect-[4/5] w-full max-w-full overflow-hidden rounded-[32px] border border-stone-200/50 bg-[#D9D2C6] shadow-[0_40px_90px_-45px_rgba(15,27,45,0.6)]">
         <div className="absolute inset-y-0 left-[14%] right-[14%]" style={{ ...glass, clipPath: "polygon(16% 0, 84% 0, 100% 100%, 0 100%)" }} aria-hidden="true" />
         {photo && (
+          <div data-parallax="-0.12" className="absolute -inset-y-[8%] inset-x-0">
           <img
             src={HERO_PHOTO}
             alt="מגדל מגורים מודרני עם מרפסות על רקע שמיים כחולים"
@@ -300,11 +425,13 @@ function HeroShowcase({ onPick }) {
             fetchpriority="high"
             onError={() => setPhoto(false)}
           />
+          </div>
         )}
         {/* Material grading: warm bronze tone, glass sheen, brass edge */}
         <div className="pointer-events-none absolute inset-0 bg-[#9A7B4F]/25 mix-blend-soft-light" aria-hidden="true" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1C160F]/55 via-transparent to-[#F7F5F1]/15" aria-hidden="true" />
         <div className="aura-sheen pointer-events-none absolute inset-0 mix-blend-overlay" aria-hidden="true" />
+        <div className="aura-glare pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-l from-[#7A5F38] via-[#D8BC86] to-[#7A5F38]" aria-hidden="true" />
 
         {HOTSPOTS.map((s) => (
@@ -316,7 +443,9 @@ function HeroShowcase({ onPick }) {
         </figcaption>
       </figure>
       <div className="absolute left-1 -top-8 origin-top-left scale-75 sm:-left-5 sm:-top-10 sm:scale-100">
-        <TrustBadge size={132} />
+        <div data-parallax="0.18">
+          <TrustBadge size={132} />
+        </div>
       </div>
     </div>
   );
@@ -343,7 +472,7 @@ function UnitFinder({ onPick }) {
           text="סננו לפי מספר חדרים ותקציב. המחירים כוללים מע״מ, חניה ומחסן."
         />
 
-        <div className="mt-10 grid gap-6 rounded-[28px] border border-[#DDD6CB] bg-white p-5 shadow-[0_20px_60px_-40px_rgba(43,49,56,0.35)] sm:p-8 lg:grid-cols-[1.1fr_1fr] lg:items-end">
+        <div data-reveal style={{ "--d": 2 }} className="mt-10 grid gap-6 rounded-[28px] border border-[#DDD6CB] bg-white p-5 shadow-[0_20px_60px_-40px_rgba(43,49,56,0.35)] sm:p-8 lg:grid-cols-[1.1fr_1fr] lg:items-end">
           <fieldset>
             <legend className="mb-3 flex items-center gap-2 text-[15px] font-medium text-[#2B3138]">
               <SlidersHorizontal className="h-4 w-4 text-[#9A7B4F]" /> מספר חדרים
@@ -596,7 +725,7 @@ function MortgageCalculator({ price, setPrice }) {
           text="הזיזו את הסליידרים והגרף יתעדכן מיד. החישוב לפי שיטת שפיצר, בריבית קבועה לכל התקופה."
         />
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
+        <div data-reveal style={{ "--d": 2 }} className="mt-10 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
           <div className="flex flex-col gap-7 rounded-[28px] border border-[#DDD6CB] bg-white p-6 sm:p-8">
             <RangeField
               id="price"
@@ -1327,6 +1456,7 @@ export default function AuraTowers() {
   const [legal, setLegal] = useState(null);
   const [a11y, setA11y] = useState(A11Y_DEFAULT);
   const [cookie, setCookie] = useState({ open: false, settings: false });
+  const rootRef = useRef(null);
 
   useEffect(() => {
     setA11y(loadPref("aura-a11y", A11Y_DEFAULT));
@@ -1334,6 +1464,7 @@ export default function AuraTowers() {
     if (!saved || !saved.savedAt) setCookie({ open: true, settings: false });
   }, []);
   useEffect(() => savePref("aura-a11y", a11y), [a11y]);
+  const motion = useMotionFX(rootRef, !a11y.still);
 
   const pickUnit = (u) => {
     setPrice(u.price);
@@ -1352,7 +1483,8 @@ export default function AuraTowers() {
     <div
       dir="rtl"
       lang="he"
-      className={`aura min-h-screen overflow-x-hidden bg-[#F7F5F1] text-[#2B3138] antialiased ${a11y.contrast ? "hc" : ""} ${a11y.links ? "hl" : ""} ${a11y.still ? "still" : ""}`}
+      ref={rootRef}
+      className={`aura ${motion ? "motion" : ""} min-h-screen overflow-x-hidden bg-[#F7F5F1] text-[#2B3138] antialiased ${a11y.contrast ? "hc" : ""} ${a11y.links ? "hl" : ""} ${a11y.still ? "still" : ""}`}
     >
       <style>{`
         .aura, .aura button, .aura input { font-family: 'Assistant', 'Arial Hebrew', Arial, sans-serif; }
@@ -1387,6 +1519,30 @@ export default function AuraTowers() {
           background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.3) 50%, transparent 70%); animation: aura-shine 5s ease-in-out infinite; }
         @keyframes aura-shine { 0%, 65% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
         @media (prefers-reduced-motion: reduce) { .aura-ping, .aura-kenburns, .aura-sheen, .aura-cta::before, .aura-shine::after, .aura-pop { animation: none; } }
+        .aura.hc .aura-gold { background: none; color: #000; }
+
+        /* Motion: scroll reveals, headline rise, parallax, tilt (only when .motion is on) */
+        .aura-line { display: block; overflow: hidden; padding-bottom: .08em; }
+        .aura-line > span { display: inline-block; }
+        .aura.motion .aura-line > span { animation: aura-rise 1.1s cubic-bezier(.16,1,.3,1) both; animation-delay: calc(var(--d, 0) * 140ms + 100ms); }
+        @keyframes aura-rise { from { transform: translateY(105%); opacity: 0; } to { transform: none; opacity: 1; } }
+        .aura.motion [data-intro] { animation: aura-fade-up 1s cubic-bezier(.16,1,.3,1) both; animation-delay: calc(var(--d, 0) * 120ms + 150ms); }
+        @keyframes aura-fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+        .aura.motion [data-reveal] { opacity: 0; transform: translateY(36px); filter: blur(4px);
+          transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1), filter .9s ease;
+          transition-delay: calc(var(--d, 0) * 110ms); }
+        .aura.motion [data-reveal].is-in { opacity: 1; transform: none; filter: none; }
+        .aura-gold { background: linear-gradient(100deg, #7A5F38 0%, #B8945A 35%, #E6CF9F 50%, #B8945A 65%, #7A5F38 100%);
+          background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .aura.motion .aura-gold { animation: aura-gold 7s ease-in-out infinite; }
+        @keyframes aura-gold { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
+        .aura-outline { color: transparent; -webkit-text-stroke: 1px rgba(15,27,45,.28); }
+        .aura-tilt { transform-style: preserve-3d; transition: transform .6s cubic-bezier(.16,1,.3,1); will-change: transform; }
+        .aura-glare { opacity: 0; transition: opacity .4s; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255,246,228,.35), transparent 45%); }
+        .aura.motion .aura-tilt:hover .aura-glare { opacity: 1; }
+        .aura-progress { transform: scaleX(var(--sp, 0)); }
+        .aura:not(.motion) .aura-progress { display: none; }
+        [data-parallax], [data-drift] { will-change: transform; }
 
         /* Accessibility modes */
         .aura.still *, .aura.still *::before, .aura.still *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -1404,6 +1560,7 @@ export default function AuraTowers() {
 
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-[#DDD6CB]/70 bg-[#F7F5F1]/85 backdrop-blur-md">
+        <span aria-hidden="true" className="aura-progress absolute inset-x-0 bottom-[-1px] h-[2px] origin-right bg-gradient-to-l from-[#7A5F38] via-[#D8BC86] to-[#0F1B2D]" />
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-8">
           <a href="#top" className="flex items-center gap-2.5">
             <Building2 className="h-6 w-6 text-[#0F1B2D]" strokeWidth={1.5} />
@@ -1450,15 +1607,17 @@ export default function AuraTowers() {
               <MapPin className="h-4 w-4 text-[#9A7B4F]" /> שדרות הים, הרצליה פיתוח · אכלוס 2028
             </p>
             <h1 className="mt-5 text-[44px] font-bold leading-[1.05] tracking-tight text-[#0F1B2D] [text-wrap:balance] sm:text-6xl lg:text-[76px]">
-              לגור מעל הכל.
-              <span className="block font-light text-[#2B3138]">
-                שני מגדלים, <span className="font-bold text-[#9A7B4F]">אור אחד</span>.
+              <span className="aura-line"><span style={{ "--d": 0 }}>לגור מעל הכל.</span></span>
+              <span className="aura-line font-light text-[#2B3138]">
+                <span style={{ "--d": 1 }}>
+                  שני מגדלים, <span className="aura-gold font-bold">אור אחד</span>.
+                </span>
               </span>
             </h1>
-            <p className="mt-6 max-w-xl text-lg font-light leading-relaxed text-[#6B6760] sm:text-xl">
+            <p data-intro style={{ "--d": 3 }} className="mt-6 max-w-xl text-lg font-light leading-relaxed text-[#6B6760] sm:text-xl">
               148 דירות בלבד ב־34 קומות, חיפוי אבן טבעית ואלומיניום אדריכלי, נוף פתוח לים ולובי בניהול מלונאי.
             </p>
-            <div className="mt-9 flex flex-wrap items-center gap-3">
+            <div data-intro style={{ "--d": 4 }} className="mt-9 flex flex-wrap items-center gap-3">
               <a href="#quiz" className={`${ctaClass} aura-cta`}>
                 קבלו הצעת מחיר אישית <ChevronLeft className="h-4 w-4" />
               </a>
@@ -1466,7 +1625,7 @@ export default function AuraTowers() {
                 צפייה בדירות זמינות
               </a>
             </div>
-            <dl className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-[#DDD6CB] pt-7">
+            <dl data-intro style={{ "--d": 5 }} className="mt-12 grid max-w-lg grid-cols-3 gap-6 border-t border-[#DDD6CB] pt-7">
               {[
                 ["34", "קומות"],
                 ["148", "יחידות דיור"],
@@ -1474,7 +1633,9 @@ export default function AuraTowers() {
               ].map(([v, l]) => (
                 <div key={l}>
                   <dt className="sr-only">{l}</dt>
-                  <dd className="text-3xl font-bold tabular-nums text-[#0F1B2D] sm:text-4xl">{v}</dd>
+                  <dd className="text-3xl font-bold tabular-nums text-[#0F1B2D] sm:text-4xl">
+                    <CountUp to={Number(v)} active={motion} />
+                  </dd>
                   <dd className="mt-1 text-[14px] text-[#6B6760]">{l}</dd>
                 </div>
               ))}
@@ -1504,13 +1665,23 @@ export default function AuraTowers() {
       <UnitFinder onPick={pickUnit} />
       <MortgageCalculator price={price} setPrice={setPrice} />
 
+      {/* Architectural word band, slides sideways with scroll */}
+      <div aria-hidden="true" className="pointer-events-none select-none overflow-hidden border-t border-[#DDD6CB] py-10 sm:py-14">
+        <p data-drift="0.35" dir="ltr" className="aura-outline whitespace-nowrap text-[64px] font-extrabold leading-none tracking-[0.08em] sm:text-[120px]">
+          AURA TOWERS · HERZLIYA PITUACH · AURA TOWERS · HERZLIYA PITUACH
+        </p>
+        <p data-drift="-0.25" dir="ltr" className="mt-2 whitespace-nowrap text-[28px] font-light leading-none tracking-[0.4em] text-[#9A7B4F]/70 sm:text-[44px]">
+          STONE · GLASS · BRASS · LIGHT · STONE · GLASS · BRASS · LIGHT · STONE · GLASS · BRASS
+        </p>
+      </div>
+
       {/* Amenities */}
       <section id="amenities" className="scroll-mt-24 px-4 py-20 sm:px-8 lg:py-28">
         <div className="mx-auto max-w-6xl">
           <SectionTitle eyebrow="שירותי הבניין" title="רמת שירות של מלון, בבית שלכם" />
           <ul className="mt-12 grid gap-x-10 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-            {AMENITIES.map(({ icon: Icon, title, text }) => (
-              <li key={title} className="flex gap-4">
+            {AMENITIES.map(({ icon: Icon, title, text }, i) => (
+              <li key={title} data-reveal style={{ "--d": i % 3 }} className="flex gap-4">
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#ECE7DF] text-[#0F1B2D]">
                   <Icon className="h-5 w-5" strokeWidth={1.6} />
                 </span>
