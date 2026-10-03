@@ -149,51 +149,135 @@ function savePref(key, value) {
 function TrustBadge({ size = 148 }) {
   return (
     <div className="relative" style={{ width: size, height: size }}>
-      <svg viewBox="0 0 200 200" className="aura-spin h-full w-full" aria-hidden="true" direction="ltr">
+      <svg
+        viewBox="0 0 200 200"
+        className="aura-spin h-full w-full drop-shadow-[0_12px_24px_rgba(15,27,45,0.18)]"
+        aria-hidden="true"
+        direction="ltr"
+        shapeRendering="geometricPrecision"
+        textRendering="geometricPrecision"
+      >
         <defs>
-          <path id="aura-badge-circle" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0" />
+          <path id="aura-badge-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
         </defs>
-        <circle cx="100" cy="100" r="98" fill="#F7F5F1" fillOpacity="0.92" />
-        <circle cx="100" cy="100" r="96" fill="none" stroke="#2B3138" strokeOpacity="0.18" />
-        <circle cx="100" cy="100" r="58" fill="none" stroke="#9A7B4F" strokeOpacity="0.5" />
-        <text fill="#2B3138" fontSize="12.5" fontWeight="700" letterSpacing="1" fontFamily="Assistant, sans-serif">
-          {/* One pass stretched to the full circumference (2π·76 ≈ 477) so the loop is seamless */}
-          <textPath href="#aura-badge-circle" startOffset="0" textLength="470" lengthAdjust="spacing">
+        <circle cx="100" cy="100" r="99" fill="#FBFAF7" />
+        <circle cx="100" cy="100" r="96.5" fill="none" stroke="#0F1B2D" strokeWidth="0.6" />
+        <circle cx="100" cy="100" r="92.5" fill="none" stroke="#9A7B4F" strokeWidth="0.4" strokeOpacity="0.7" />
+        <circle cx="100" cy="100" r="64" fill="none" stroke="#0F1B2D" strokeWidth="0.6" />
+        <circle cx="100" cy="100" r="61" fill="none" stroke="#9A7B4F" strokeWidth="0.4" strokeOpacity="0.7" />
+        <text fill="#0F1B2D" fontSize="10.5" fontWeight="400" fontFamily="Assistant, sans-serif">
+          {/* One pass stretched to the full circumference (2π·78 ≈ 490) so the loop is seamless */}
+          <textPath href="#aura-badge-circle" startOffset="0" textLength="486" lengthAdjust="spacing">
             • AURA TOWERS • ARCHITECTURAL MASTERPIECE • HERZLIYA PITUACH
           </textPath>
         </text>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <Award className="h-7 w-7 text-[#9A7B4F]" strokeWidth={1.4} />
-        <span className="mt-1 text-[11px] font-bold tracking-[0.2em] text-[#2B3138]">2026</span>
+        <span className="text-[22px] font-light leading-none tracking-[0.12em] text-[#0F1B2D]">AT</span>
+        <span className="mt-1.5 h-px w-8 bg-[#9A7B4F]" />
+        <span className="mt-1.5 text-[8.5px] font-normal tracking-[0.32em] text-[#2B3138]">EST. 2026</span>
       </div>
     </div>
   );
 }
 
-/* ---------- Hero showcase: facade render + glass floor picker ---------- */
+/* ---------- Hero showcase: architectural photo + interactive hotspots ---------- */
 
-const TOP_FLOOR = 36;
+// Free-license photo from Freepik (attribution shown on the image). Swap for the project's own renders.
+const HERO_PHOTO = "https://img.magnific.com/free-photo/vertical-glass-building-with-white-balconies-blue-sky_181624-6492.jpg?w=1200";
 
-function FloatingTag({ className = "", children }) {
+const HOTSPOTS = [
+  { id: "ph", label: "פנטהאוז זמין", x: 62, y: 16, unit: "N-3401", note: "גג פרטי של 95 מ״ר עם ג׳קוזי ומטבח חוץ" },
+  { id: "sea", label: "נוף פנורמי לים", x: 26, y: 40, unit: "N-2503", note: "חזית מערבית, שקיעה מעל הים בכל ערב" },
+  { id: "park", label: "מבט לפארק", x: 60, y: 66, unit: "S-1605", note: "חלונות מקיר לקיר מול הגן הפרטי" },
+];
+
+function Hotspot({ spot, open, onToggle, onPick }) {
+  const unit = UNITS.find((u) => u.id === spot.unit);
+  const side = spot.x > 50 ? { right: `${100 - spot.x}%` } : { left: `${spot.x}%` };
   return (
-    <div
-      className={`absolute flex items-center gap-2 rounded-full border border-stone-200/50 bg-white/70 px-3.5 py-2 text-[13px] font-semibold text-[#0F1B2D] shadow-[0_10px_30px_-12px_rgba(15,27,45,0.45)] backdrop-blur-md ${className}`}
-    >
-      <span className="relative flex h-2.5 w-2.5">
-        <span className="aura-ping absolute inline-flex h-full w-full rounded-full bg-[#9A7B4F] opacity-60" />
-        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#9A7B4F]" />
-      </span>
-      {children}
-    </div>
+    <>
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={open}
+        aria-controls={`spot-${spot.id}`}
+        className="group absolute z-10 flex -translate-x-1/2 -translate-y-1/2 items-center gap-2 focus-visible:outline-none"
+        style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
+      >
+        <span className="relative flex h-9 w-9 items-center justify-center">
+          <span className="aura-ping absolute inline-flex h-full w-full rounded-full bg-white/70" />
+          <span className="absolute inline-flex h-9 w-9 rounded-full border border-white/70 bg-white/20 backdrop-blur-md" />
+          <span className={`relative h-3 w-3 rounded-full ring-2 ring-white transition ${open ? "bg-[#0F1B2D]" : "bg-[#B8945A]"}`} />
+        </span>
+        <span className="whitespace-nowrap rounded-full border border-stone-200/50 bg-white/75 px-3 py-1.5 text-[13px] font-semibold text-[#0F1B2D] shadow-[0_10px_30px_-12px_rgba(15,27,45,0.5)] backdrop-blur-md transition group-hover:bg-white group-focus-visible:ring-2 group-focus-visible:ring-[#9A7B4F]">
+          {spot.label}
+        </span>
+      </button>
+      {open && unit && (
+        <div
+          id={`spot-${spot.id}`}
+          role="dialog"
+          aria-label={spot.label}
+          className="aura-pop absolute z-20 w-[min(16rem,80%)] rounded-[20px] border border-stone-200/60 bg-white/85 p-4 shadow-[0_30px_60px_-25px_rgba(15,27,45,0.65)] backdrop-blur-xl"
+          style={{ top: `calc(${spot.y}% + 28px)`, ...side }}
+        >
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#7A5F38]">{unit.tower}</p>
+          <p className="mt-1 text-[17px] font-bold text-[#0F1B2D]">
+            {unit.rooms === 6 ? "פנטהאוז" : `דירת ${unit.rooms} חדרים`} · קומה {unit.floor}
+          </p>
+          <p className="mt-1 text-[13px] leading-snug text-[#6B6760]">{spot.note}</p>
+          <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-[#ECE7DF] pt-3 text-[12px]">
+            <div>
+              <dt className="text-[#6B6760]">שטח</dt>
+              <dd className="font-semibold tabular-nums text-[#2B3138]">{unit.sqm} מ״ר</dd>
+            </div>
+            <div>
+              <dt className="text-[#6B6760]">מרפסת</dt>
+              <dd className="font-semibold tabular-nums text-[#2B3138]">{unit.balcony} מ״ר</dd>
+            </div>
+            <div>
+              <dt className="text-[#6B6760]">קומה</dt>
+              <dd className="font-semibold tabular-nums text-[#2B3138]">{unit.floor}</dd>
+            </div>
+          </dl>
+          <div className="mt-3 flex items-end justify-between gap-2">
+            <div>
+              <p className="text-[11px] text-[#6B6760]">מחיר פתיחה</p>
+              <p className="text-[18px] font-bold tabular-nums text-[#0F1B2D]">{nis(unit.price)}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onPick(unit)}
+              className="inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#0F1B2D] px-3 py-2 text-[12px] font-semibold text-white transition hover:bg-[#3A4A5E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9A7B4F]"
+            >
+              חישוב החזר <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
 
 function HeroShowcase({ onPick }) {
-  const floors = useMemo(() => [...UNITS].sort((a, b) => b.floor - a.floor), []);
-  const [selected, setSelected] = useState(floors[0]);
-  const bandTop = `${(1 - selected.floor / TOP_FLOOR) * 100}%`;
+  const [active, setActive] = useState(null);
+  const [photo, setPhoto] = useState(true);
+  const ref = useRef(null);
 
+  useEffect(() => {
+    if (!active) return undefined;
+    const onDown = (e) => !ref.current?.contains(e.target) && setActive(null);
+    const onKey = (e) => e.key === "Escape" && setActive(null);
+    document.addEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [active]);
+
+  // Fallback facade render, shown until (or instead of) the photo
   const glass = {
     backgroundImage: [
       "linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 38%)",
@@ -202,78 +286,34 @@ function HeroShowcase({ onPick }) {
       "linear-gradient(165deg, #9DB0C0 0%, #CFC6B6 42%, #7C8894 70%, #4A5561 100%)",
     ].join(","),
   };
-  const shade = {
-    backgroundImage: [
-      "repeating-linear-gradient(90deg, rgba(18,22,27,0.95) 0 3px, transparent 3px 30px)",
-      "repeating-linear-gradient(180deg, rgba(18,22,27,0.92) 0 5px, transparent 5px 30px)",
-      "linear-gradient(190deg, #6B7884 0%, #3E4852 55%, #262D35 100%)",
-    ].join(","),
-  };
 
   return (
-    <div className="relative mx-auto w-full max-w-[480px]">
-      <figure
-        className="relative aspect-[4/5] w-full max-w-full overflow-hidden rounded-[32px] border border-stone-200/50 shadow-[0_40px_90px_-45px_rgba(15,27,45,0.6)]"
-        style={{ background: "linear-gradient(180deg, #D9D2C6 0%, #EFEAE2 55%, #F7F5F1 100%)" }}
-      >
-        {/* Looking-up corner view of the tower */}
-        <div className="absolute inset-y-0 left-[12%] right-[46%]" style={{ ...glass, clipPath: "polygon(18% 0, 100% 0, 100% 100%, 0 100%)" }} aria-hidden="true" />
-        <div className="absolute inset-y-0 left-[54%] right-[14%]" style={{ ...shade, clipPath: "polygon(0 0, 70% 0, 100% 100%, 0 100%)" }} aria-hidden="true" />
-        <div className="absolute inset-y-0 left-[54%] w-px bg-white/40" aria-hidden="true" />
-        {/* Selected floor band */}
-        <div
-          className="absolute inset-x-[10%] h-[3.2%] rounded-sm bg-[#C9A86E]/80 shadow-[0_0_24px_6px_rgba(201,168,110,0.55)] transition-all duration-700 ease-out"
-          style={{ top: bandTop }}
-          aria-hidden="true"
-        />
-        <figcaption className="sr-only">הדמיית חזית מגדל Aura Towers עם סימון הקומה הנבחרת</figcaption>
+    <div ref={ref} className="relative mx-auto w-full max-w-[480px]">
+      <figure className="relative aspect-[4/5] w-full max-w-full overflow-hidden rounded-[32px] border border-stone-200/50 bg-[#D9D2C6] shadow-[0_40px_90px_-45px_rgba(15,27,45,0.6)]">
+        <div className="absolute inset-y-0 left-[14%] right-[14%]" style={{ ...glass, clipPath: "polygon(16% 0, 84% 0, 100% 100%, 0 100%)" }} aria-hidden="true" />
+        {photo && (
+          <img
+            src={HERO_PHOTO}
+            alt="מגדל מגורים עם חזית זכוכית ומרפסות לבנות על רקע שמיים כחולים"
+            className="aura-kenburns absolute inset-0 h-full w-full object-cover"
+            loading="eager"
+            fetchpriority="high"
+            onError={() => setPhoto(false)}
+          />
+        )}
+        {/* Material grading: warm bronze tone, glass sheen, brass edge */}
+        <div className="pointer-events-none absolute inset-0 bg-[#9A7B4F]/25 mix-blend-soft-light" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1C160F]/55 via-transparent to-[#F7F5F1]/15" aria-hidden="true" />
+        <div className="aura-sheen pointer-events-none absolute inset-0 mix-blend-overlay" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-l from-[#7A5F38] via-[#D8BC86] to-[#7A5F38]" aria-hidden="true" />
 
-        <FloatingTag className="right-4 top-4">קומה 34 · פנטהאוז זמין</FloatingTag>
-        <FloatingTag className="left-4 top-[30%]">נוף פנורמי לים</FloatingTag>
+        {HOTSPOTS.map((s) => (
+          <Hotspot key={s.id} spot={s} open={active === s.id} onToggle={() => setActive((a) => (a === s.id ? null : s.id))} onPick={onPick} />
+        ))}
 
-        {/* Glass floor picker */}
-        <div className="absolute inset-x-3 bottom-3 rounded-[22px] border border-stone-200/50 bg-white/60 p-4 backdrop-blur-md sm:inset-x-4 sm:bottom-4">
-          <div className="flex items-baseline justify-between gap-3">
-            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#7A5F38]">בחירת קומה</p>
-            <p className="text-[12px] text-[#2B3138]">{selected.tower}</p>
-          </div>
-          <div className="aura-scroll -mx-1 mt-2 flex gap-1.5 overflow-x-auto px-1 pb-1" role="radiogroup" aria-label="קומות עם דירות זמינות">
-            {floors.map((u) => {
-              const on = u.id === selected.id;
-              return (
-                <button
-                  key={u.id}
-                  type="button"
-                  role="radio"
-                  aria-checked={on}
-                  onClick={() => setSelected(u)}
-                  className={`shrink-0 rounded-full px-3 py-1.5 text-[13px] font-semibold tabular-nums transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#9A7B4F] ${
-                    on ? "bg-[#0F1B2D] text-white" : "bg-white/70 text-[#2B3138] hover:bg-white"
-                  }`}
-                >
-                  {u.floor}
-                </button>
-              );
-            })}
-          </div>
-          <div className="mt-3 flex items-end justify-between gap-3">
-            <div className="min-w-0">
-              <p className="text-[16px] font-bold text-[#0F1B2D]">
-                {selected.rooms === 6 ? "פנטהאוז" : `${selected.rooms} חדרים`} · {selected.sqm} מ״ר
-              </p>
-              <p className="truncate text-[13px] text-[#2B3138]">
-                {nis(selected.price)} · {selected.view}
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => onPick(selected)}
-              className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#0F1B2D] px-3.5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#3A4A5E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9A7B4F]"
-            >
-              חישוב החזר <ChevronLeft className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        </div>
+        <figcaption className="absolute bottom-3 right-4 text-[10px] tracking-wide text-white/75">
+          {photo ? "צילום: Freepik · להמחשה בלבד" : "הדמיה להמחשה בלבד"}
+        </figcaption>
       </figure>
       <div className="absolute -left-2 -top-8 origin-top-left scale-75 sm:-left-10 sm:-top-10 sm:scale-100">
         <TrustBadge size={132} />
@@ -1317,7 +1357,7 @@ export default function AuraTowers() {
       <style>{`
         .aura, .aura button, .aura input { font-family: 'Assistant', 'Arial Hebrew', Arial, sans-serif; }
         @keyframes aura-spin { to { transform: rotate(360deg); } }
-        .aura-spin { animation: aura-spin 22s linear infinite; transform-origin: 50% 50%; }
+        .aura-spin { animation: aura-spin 48s linear infinite; transform-origin: 50% 50%; }
         @media (prefers-reduced-motion: reduce) { .aura-spin { animation: none; } }
         .aura-range { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 999px; cursor: pointer;
           background: linear-gradient(to left, #0F1B2D 0, #3A4A5E var(--pct), #E4DED4 var(--pct)); }
@@ -1331,7 +1371,22 @@ export default function AuraTowers() {
         .aura-ping { animation: aura-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
         .aura-scroll { scrollbar-width: none; }
         .aura-scroll::-webkit-scrollbar { display: none; }
-        @media (prefers-reduced-motion: reduce) { .aura-ping { animation: none; } }
+        @keyframes aura-pop { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
+        .aura-pop { animation: aura-pop .22s ease-out; }
+        @keyframes aura-kenburns { from { transform: scale(1.04); } to { transform: scale(1.12) translateY(-1.5%); } }
+        .aura-kenburns { animation: aura-kenburns 24s ease-in-out infinite alternate; }
+        @keyframes aura-sheen-move { 0%, 55% { background-position: 160% 0; } 100% { background-position: -60% 0; } }
+        .aura-sheen { background: linear-gradient(115deg, transparent 35%, rgba(255,240,215,.55) 50%, transparent 65%) no-repeat;
+          background-size: 220% 100%; animation: aura-sheen-move 9s ease-in-out infinite; }
+        .aura-cta { position: relative; isolation: isolate; }
+        .aura-cta::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #0F1B2D; z-index: -1;
+          animation: aura-halo 2.8s ease-out infinite; }
+        @keyframes aura-halo { 0% { transform: scale(1); opacity: .35; } 70%, 100% { transform: scale(1.12, 1.4); opacity: 0; } }
+        .aura-shine { position: relative; overflow: hidden; }
+        .aura-shine::after { content: ""; position: absolute; inset: 0; transform: translateX(-130%);
+          background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.3) 50%, transparent 70%); animation: aura-shine 5s ease-in-out infinite; }
+        @keyframes aura-shine { 0%, 65% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
+        @media (prefers-reduced-motion: reduce) { .aura-ping, .aura-kenburns, .aura-sheen, .aura-cta::before, .aura-shine::after, .aura-pop { animation: none; } }
 
         /* Accessibility modes */
         .aura.still *, .aura.still *::before, .aura.still *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
@@ -1363,7 +1418,7 @@ export default function AuraTowers() {
               </a>
             ))}
           </nav>
-          <a href="#quiz" className={`${ctaClass} hidden !px-5 !py-2.5 md:inline-flex`}>
+          <a href="#quiz" className={`${ctaClass} aura-shine hidden !bg-none !bg-[#0F1B2D] !px-5 !py-2.5 ring-1 ring-[#9A7B4F]/40 md:inline-flex`}>
             תיאום פגישה
           </a>
           <button
@@ -1404,7 +1459,7 @@ export default function AuraTowers() {
               148 דירות בלבד ב־34 קומות, חיפוי אבן טבעית ואלומיניום אדריכלי, נוף פתוח לים ולובי בניהול מלונאי.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-3">
-              <a href="#quiz" className={ctaClass}>
+              <a href="#quiz" className={`${ctaClass} aura-cta`}>
                 קבלו הצעת מחיר אישית <ChevronLeft className="h-4 w-4" />
               </a>
               <a href="#units" className={ghostClass}>
