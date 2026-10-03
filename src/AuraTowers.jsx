@@ -1,5 +1,6 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
+  Accessibility,
   Award,
   BedDouble,
   Building2,
@@ -8,12 +9,21 @@ import {
   ChevronLeft,
   ChevronRight,
   Compass,
+  Contrast,
+  Cookie,
   Dumbbell,
+  FileText,
   KeyRound,
   Layers,
+  Link2,
+  Lock,
   MapPin,
   Menu,
+  Minus,
+  Pause,
   Phone,
+  Plus,
+  RotateCcw,
   Ruler,
   ShieldCheck,
   SlidersHorizontal,
@@ -115,22 +125,41 @@ function RangeField({ id, label, value, min, max, step, onChange, display }) {
   );
 }
 
-/* ---------- Rotating trust badge ---------- */
+/* ---------- Local storage helpers (fail quietly in private mode) ---------- */
+
+function loadPref(key, fallback) {
+  try {
+    const raw = window.localStorage.getItem(key);
+    return raw ? { ...fallback, ...JSON.parse(raw) } : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function savePref(key, value) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* storage unavailable */
+  }
+}
+
+/* ---------- Rotating seal ---------- */
 
 function TrustBadge({ size = 148 }) {
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg viewBox="0 0 200 200" className="aura-spin h-full w-full" aria-hidden="true" direction="ltr">
         <defs>
-          <path id="aura-badge-circle" d="M100,100 m-74,0 a74,74 0 1,1 148,0 a74,74 0 1,1 -148,0" />
+          <path id="aura-badge-circle" d="M100,100 m-76,0 a76,76 0 1,1 152,0 a76,76 0 1,1 -152,0" />
         </defs>
-        <circle cx="100" cy="100" r="98" fill="#F7F5F1" />
+        <circle cx="100" cy="100" r="98" fill="#F7F5F1" fillOpacity="0.92" />
         <circle cx="100" cy="100" r="96" fill="none" stroke="#2B3138" strokeOpacity="0.18" />
-        <circle cx="100" cy="100" r="56" fill="none" stroke="#9A7B4F" strokeOpacity="0.5" />
-        <text fill="#2B3138" fontSize="19" fontWeight="700" fontFamily="Assistant, sans-serif">
-          {/* One pass of the phrase stretched to the full circumference (2π·74 ≈ 465) so it loops seamlessly */}
-          <textPath href="#aura-badge-circle" startOffset="0" textLength="458" lengthAdjust="spacing">
-            • פרויקט יוקרה נבחר • פרימיום לוקיישן
+        <circle cx="100" cy="100" r="58" fill="none" stroke="#9A7B4F" strokeOpacity="0.5" />
+        <text fill="#2B3138" fontSize="12.5" fontWeight="700" letterSpacing="1" fontFamily="Assistant, sans-serif">
+          {/* One pass stretched to the full circumference (2π·76 ≈ 477) so the loop is seamless */}
+          <textPath href="#aura-badge-circle" startOffset="0" textLength="470" lengthAdjust="spacing">
+            • AURA TOWERS • ARCHITECTURAL MASTERPIECE • HERZLIYA PITUACH
           </textPath>
         </text>
       </svg>
@@ -142,75 +171,114 @@ function TrustBadge({ size = 148 }) {
   );
 }
 
-/* ---------- Hero illustration (drawn, no external imagery) ---------- */
+/* ---------- Hero showcase: facade render + glass floor picker ---------- */
 
-function TowersArt() {
-  const floorsA = 34;
-  const floorsB = 28;
-  const lit = new Set([3, 7, 12, 15, 19, 22, 26, 30, 33]);
+const TOP_FLOOR = 36;
+
+function FloatingTag({ className = "", children }) {
   return (
-    <svg viewBox="0 0 420 520" className="h-auto w-full" role="img" aria-label="הדמיית שני מגדלי Aura Towers">
-      <defs>
-        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#E6E0D6" />
-          <stop offset="1" stopColor="#F7F5F1" />
-        </linearGradient>
-        <linearGradient id="aluA" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#3B434C" />
-          <stop offset="0.55" stopColor="#2B3138" />
-          <stop offset="1" stopColor="#1F242A" />
-        </linearGradient>
-        <linearGradient id="aluB" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0" stopColor="#56606B" />
-          <stop offset="1" stopColor="#38404A" />
-        </linearGradient>
-        <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#FFFFFF" stopOpacity="0.16" />
-          <stop offset="1" stopColor="#FFFFFF" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-      <rect x="0" y="0" width="420" height="520" rx="28" fill="url(#sky)" />
-      <circle cx="318" cy="96" r="44" fill="#9A7B4F" fillOpacity="0.12" />
-      {/* Tower B (back) */}
-      <g>
-        <rect x="236" y="150" width="104" height="330" fill="url(#aluB)" />
-        {Array.from({ length: floorsB }).map((_, i) => (
-          <line key={i} x1="236" x2="340" y1={160 + i * 11.4} y2={160 + i * 11.4} stroke="#8A939D" strokeOpacity="0.35" />
-        ))}
-        {[262, 288, 314].map((x) => (
-          <line key={x} x1={x} x2={x} y1="150" y2="480" stroke="#8A939D" strokeOpacity="0.25" />
-        ))}
-        <rect x="236" y="150" width="104" height="330" fill="url(#glass)" />
-      </g>
-      {/* Tower A (front) */}
-      <g>
-        <rect x="96" y="62" width="128" height="418" fill="url(#aluA)" />
-        <rect x="108" y="48" width="104" height="14" fill="#2B3138" />
-        {Array.from({ length: floorsA }).map((_, i) => {
-          const y = 74 + i * 11.8;
-          return (
-            <g key={i}>
-              <line x1="96" x2="224" y1={y} y2={y} stroke="#7C858F" strokeOpacity="0.4" />
-              {lit.has(i) && <rect x={i % 2 ? 128 : 160} y={y + 2.5} width="30" height="6.5" fill="#C9A86E" fillOpacity="0.85" />}
-            </g>
-          );
-        })}
-        {[128, 160, 192].map((x) => (
-          <line key={x} x1={x} x2={x} y1="62" y2="480" stroke="#7C858F" strokeOpacity="0.3" />
-        ))}
-        <rect x="96" y="62" width="128" height="418" fill="url(#glass)" />
-      </g>
-      {/* Podium and ground */}
-      <rect x="70" y="456" width="300" height="24" fill="#D6CFC3" />
-      <rect x="70" y="456" width="300" height="3" fill="#9A7B4F" fillOpacity="0.55" />
-      <rect x="40" y="480" width="340" height="2" fill="#2B3138" fillOpacity="0.25" />
-      <g fill="#7E8B6E" fillOpacity="0.55">
-        <circle cx="60" cy="468" r="12" />
-        <circle cx="80" cy="472" r="9" />
-        <circle cx="360" cy="468" r="11" />
-        <circle cx="384" cy="472" r="8" />
-      </g>
-    </svg>
+    <div
+      className={`absolute flex items-center gap-2 rounded-full border border-stone-200/50 bg-white/70 px-3.5 py-2 text-[13px] font-semibold text-[#0F1B2D] shadow-[0_10px_30px_-12px_rgba(15,27,45,0.45)] backdrop-blur-md ${className}`}
+    >
+      <span className="relative flex h-2.5 w-2.5">
+        <span className="aura-ping absolute inline-flex h-full w-full rounded-full bg-[#9A7B4F] opacity-60" />
+        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#9A7B4F]" />
+      </span>
+      {children}
+    </div>
+  );
+}
+
+function HeroShowcase({ onPick }) {
+  const floors = useMemo(() => [...UNITS].sort((a, b) => b.floor - a.floor), []);
+  const [selected, setSelected] = useState(floors[0]);
+  const bandTop = `${(1 - selected.floor / TOP_FLOOR) * 100}%`;
+
+  const glass = {
+    backgroundImage: [
+      "linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 38%)",
+      "repeating-linear-gradient(90deg, rgba(24,29,35,0.92) 0 3px, transparent 3px 44px)",
+      "repeating-linear-gradient(180deg, rgba(24,29,35,0.9) 0 5px, transparent 5px 30px)",
+      "linear-gradient(165deg, #9DB0C0 0%, #CFC6B6 42%, #7C8894 70%, #4A5561 100%)",
+    ].join(","),
+  };
+  const shade = {
+    backgroundImage: [
+      "repeating-linear-gradient(90deg, rgba(18,22,27,0.95) 0 3px, transparent 3px 30px)",
+      "repeating-linear-gradient(180deg, rgba(18,22,27,0.92) 0 5px, transparent 5px 30px)",
+      "linear-gradient(190deg, #6B7884 0%, #3E4852 55%, #262D35 100%)",
+    ].join(","),
+  };
+
+  return (
+    <div className="relative mx-auto w-full max-w-[480px]">
+      <figure
+        className="relative aspect-[4/5] w-full max-w-full overflow-hidden rounded-[32px] border border-stone-200/50 shadow-[0_40px_90px_-45px_rgba(15,27,45,0.6)]"
+        style={{ background: "linear-gradient(180deg, #D9D2C6 0%, #EFEAE2 55%, #F7F5F1 100%)" }}
+      >
+        {/* Looking-up corner view of the tower */}
+        <div className="absolute inset-y-0 left-[12%] right-[46%]" style={{ ...glass, clipPath: "polygon(18% 0, 100% 0, 100% 100%, 0 100%)" }} aria-hidden="true" />
+        <div className="absolute inset-y-0 left-[54%] right-[14%]" style={{ ...shade, clipPath: "polygon(0 0, 70% 0, 100% 100%, 0 100%)" }} aria-hidden="true" />
+        <div className="absolute inset-y-0 left-[54%] w-px bg-white/40" aria-hidden="true" />
+        {/* Selected floor band */}
+        <div
+          className="absolute inset-x-[10%] h-[3.2%] rounded-sm bg-[#C9A86E]/80 shadow-[0_0_24px_6px_rgba(201,168,110,0.55)] transition-all duration-700 ease-out"
+          style={{ top: bandTop }}
+          aria-hidden="true"
+        />
+        <figcaption className="sr-only">הדמיית חזית מגדל Aura Towers עם סימון הקומה הנבחרת</figcaption>
+
+        <FloatingTag className="right-4 top-4">קומה 34 · פנטהאוז זמין</FloatingTag>
+        <FloatingTag className="left-4 top-[30%]">נוף פנורמי לים</FloatingTag>
+
+        {/* Glass floor picker */}
+        <div className="absolute inset-x-3 bottom-3 rounded-[22px] border border-stone-200/50 bg-white/60 p-4 backdrop-blur-md sm:inset-x-4 sm:bottom-4">
+          <div className="flex items-baseline justify-between gap-3">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#7A5F38]">בחירת קומה</p>
+            <p className="text-[12px] text-[#2B3138]">{selected.tower}</p>
+          </div>
+          <div className="aura-scroll -mx-1 mt-2 flex gap-1.5 overflow-x-auto px-1 pb-1" role="radiogroup" aria-label="קומות עם דירות זמינות">
+            {floors.map((u) => {
+              const on = u.id === selected.id;
+              return (
+                <button
+                  key={u.id}
+                  type="button"
+                  role="radio"
+                  aria-checked={on}
+                  onClick={() => setSelected(u)}
+                  className={`shrink-0 rounded-full px-3 py-1.5 text-[13px] font-semibold tabular-nums transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#9A7B4F] ${
+                    on ? "bg-[#0F1B2D] text-white" : "bg-white/70 text-[#2B3138] hover:bg-white"
+                  }`}
+                >
+                  {u.floor}
+                </button>
+              );
+            })}
+          </div>
+          <div className="mt-3 flex items-end justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[16px] font-bold text-[#0F1B2D]">
+                {selected.rooms === 6 ? "פנטהאוז" : `${selected.rooms} חדרים`} · {selected.sqm} מ״ר
+              </p>
+              <p className="truncate text-[13px] text-[#2B3138]">
+                {nis(selected.price)} · {selected.view}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => onPick(selected)}
+              className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#0F1B2D] px-3.5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#3A4A5E] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9A7B4F]"
+            >
+              חישוב החזר <ChevronLeft className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        </div>
+      </figure>
+      <div className="absolute -left-2 -top-8 origin-top-left scale-75 sm:-left-10 sm:-top-10 sm:scale-100">
+        <TrustBadge size={132} />
+      </div>
+    </div>
   );
 }
 
@@ -828,12 +896,404 @@ function LeadQuiz({ presetRooms }) {
   );
 }
 
+/* ---------- Legal documents (sample wording for the demo) ---------- */
+
+const LEGAL = {
+  terms: {
+    title: "תקנון ותנאי שימוש",
+    sections: [
+      {
+        h: "כללי",
+        p: [
+          "אתר Aura Towers (להלן: \"האתר\") מופעל לצורך הצגת פרויקט המגורים Aura Towers. השימוש באתר כפוף לתנאים המפורטים להלן, והגלישה בו מהווה הסכמה להם.",
+          "התקנון מנוסח בלשון רבים מטעמי נוחות בלבד, והוא מתייחס לכל המגדרים.",
+        ],
+      },
+      {
+        h: "מידע, הדמיות ומחירים",
+        p: [
+          "ההדמיות, התוכניות, המפרטים והמחירים באתר מוצגים להמחשה בלבד ואינם מהווים הצעה מחייבת. הנתונים הקובעים הם אלה שבהסכם המכר ובמפרט המכר לפי חוק המכר (דירות), התשל״ג-1973.",
+          "מחשבון המשכנתא מספק הערכה בלבד ואינו מהווה ייעוץ פיננסי או הצעת מימון. תנאי ההלוואה בפועל נקבעים על ידי הגוף המממן.",
+        ],
+      },
+      {
+        h: "קניין רוחני",
+        p: ["כל התכנים באתר, לרבות עיצוב, טקסטים, הדמיות וסימני מסחר, שייכים למפעילי האתר. אין להעתיק, להפיץ או לעשות בהם שימוש מסחרי ללא אישור מראש ובכתב."],
+      },
+      {
+        h: "השארת פרטים",
+        p: ["השארת פרטים בשאלון ההתאמה מהווה הסכמה ליצירת קשר בנוגע לפרויקט. ניתן לבקש בכל עת להסיר את הפרטים מרשימת הפניות, כמפורט במדיניות הפרטיות."],
+      },
+      {
+        h: "הגבלת אחריות",
+        p: ["האתר ניתן לשימוש כפי שהוא (AS IS). מפעילי האתר אינם אחראים לנזק שייגרם עקב הסתמכות על מידע באתר, תקלות טכניות או הפסקות בשירות."],
+      },
+      {
+        h: "דין וסמכות שיפוט",
+        p: ["על השימוש באתר יחולו דיני מדינת ישראל בלבד. סמכות השיפוט הבלעדית נתונה לבתי המשפט המוסמכים במחוז תל אביב-יפו."],
+      },
+    ],
+  },
+  privacy: {
+    title: "מדיניות פרטיות",
+    sections: [
+      {
+        h: "מי אנחנו",
+        p: [
+          "מדיניות זו מסבירה איך נאסף ומעובד מידע אישי באתר, בהתאם לחוק הגנת הפרטיות, התשמ״א-1981 ותקנותיו (כולל תיקון 13), ולתקנה האירופית להגנת מידע (GDPR) ככל שהיא חלה.",
+        ],
+      },
+      {
+        h: "איזה מידע נאסף",
+        p: [
+          "מידע שתמסרו בשאלון: שם, טלפון, מטרת הרכישה, גודל הדירה המבוקש ומועד כניסה רצוי.",
+          "מידע טכני: סוג הדפדפן, כתובת IP ונתוני גלישה מצטברים, וזאת רק אם אישרתם עוגיות סטטיסטיקה.",
+        ],
+      },
+      {
+        h: "מטרות השימוש והבסיס החוקי",
+        p: [
+          "יצירת קשר והצגת הצעות מחיר, על בסיס הסכמתכם. שיפור האתר, על בסיס הסכמה לעוגיות סטטיסטיקה. עמידה בחובות חוקיות, ככל שנדרש.",
+          "המידע לא יימכר לצדדים שלישיים. הוא עשוי לעבור לספקי שירות (למשל מערכת CRM או אחסון ענן) המחויבים לסודיות ולאבטחת מידע.",
+        ],
+      },
+      {
+        h: "עוגיות",
+        p: ["עוגיות חיוניות נדרשות לתפקוד האתר ופועלות תמיד. עוגיות סטטיסטיקה ושיווק מופעלות רק לאחר הסכמה, וניתן לשנות את הבחירה בכל עת דרך \"הגדרות עוגיות\" בתחתית העמוד."],
+      },
+      {
+        h: "שמירת מידע ואבטחה",
+        p: ["פרטי פניות נשמרים עד 24 חודשים ממועד הפנייה האחרונה ולאחר מכן נמחקים. המידע מאובטח בהצפנה בהעברה (TLS) ובהרשאות גישה מוגבלות."],
+      },
+      {
+        h: "הזכויות שלכם",
+        p: [
+          "אתם רשאים לעיין במידע עליכם, לבקש לתקן או למחוק אותו, להתנגד לעיבוד או לבטל הסכמה. GDPR מקנה גם זכות לניידות מידע ולהגשת תלונה לרשות פיקוח.",
+          "פניות בנושא פרטיות: privacy@auratowers.example. נשיב תוך 30 ימים.",
+        ],
+      },
+    ],
+  },
+  a11y: {
+    title: "הצהרת נגישות",
+    sections: [
+      {
+        h: "מחויבות לנגישות",
+        p: ["אנו רואים חשיבות בהנגשת האתר לאנשים עם מוגבלות, בהתאם לחוק שוויון זכויות לאנשים עם מוגבלות, התשנ״ח-1998, ולתקנות שוויון זכויות לאנשים עם מוגבלות (התאמות נגישות לשירות), התשע״ג-2013."],
+      },
+      {
+        h: "רמת הנגישות",
+        p: [
+          "האתר הונגש בהתאם לתקן הישראלי ת״י 5568, המבוסס על הנחיות WCAG 2.1 ברמה AA.",
+          "האתר נבדק בדפדפנים Chrome, Safari, Firefox ו-Edge, במחשב ובנייד, ובשילוב קורא המסך NVDA.",
+        ],
+      },
+      {
+        h: "התאמות שבוצעו",
+        p: [
+          "ניווט מלא במקלדת עם סימון פוקוס ברור; מבנה כותרות היררכי; תוויות לכל שדות הטופס; טקסט חלופי לתמונות ולגרפים; ניגודיות צבעים תקנית; תמיכה בהגדלת טקסט עד 200%.",
+          "תפריט הנגישות מאפשר הגדלה והקטנה של הטקסט, מצב ניגודיות גבוהה, הדגשת קישורים ועצירת אנימציות.",
+        ],
+      },
+      {
+        h: "מגבלות ידועות",
+        p: ["הגרף במחשבון המשכנתא הוא רכיב חזותי. כל הנתונים שבו מוצגים גם כטקסט מעליו, כך שהמידע נגיש גם בלי הגרף."],
+      },
+      {
+        h: "רכז/ת נגישות",
+        p: [
+          "נתקלתם בבעיית נגישות? נשמח לשמוע ולתקן. דוא״ל: accessibility@auratowers.example, טלפון: ‎*5520.",
+          "הצהרה זו עודכנה לאחרונה באוקטובר 2026.",
+        ],
+      },
+    ],
+  },
+};
+
+function LegalDialog({ docKey, onClose }) {
+  const closeRef = useRef(null);
+  const doc = LEGAL[docKey];
+
+  useEffect(() => {
+    if (!doc) return undefined;
+    const prev = document.activeElement;
+    closeRef.current?.focus();
+    const onKey = (e) => e.key === "Escape" && onClose();
+    document.addEventListener("keydown", onKey);
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = overflow;
+      prev?.focus?.();
+    };
+  }, [doc, onClose]);
+
+  if (!doc) return null;
+  return (
+    <div className="fixed inset-0 z-[70] flex items-end justify-center bg-[#0F1B2D]/45 p-0 backdrop-blur-sm sm:items-center sm:p-6" onClick={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="legal-title"
+        onClick={(e) => e.stopPropagation()}
+        className="flex max-h-[88vh] w-full max-w-2xl flex-col rounded-t-[28px] border border-[#DDD6CB] bg-white shadow-2xl sm:rounded-[28px]"
+      >
+        <div className="flex items-start justify-between gap-4 border-b border-[#ECE7DF] px-6 py-5 sm:px-8">
+          <div>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#7A5F38]">Aura Towers · מסמך משפטי</p>
+            <h2 id="legal-title" className="mt-1 text-2xl font-bold text-[#0F1B2D]">
+              {doc.title}
+            </h2>
+          </div>
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            aria-label="סגירה"
+            className="rounded-full p-2 text-[#2B3138] transition hover:bg-[#F7F5F1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#9A7B4F]"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+        <div className="overflow-y-auto px-6 py-6 sm:px-8">
+          <p className="mb-6 rounded-xl bg-[#F7F5F1] px-4 py-3 text-[13px] text-[#6B6760]">
+            נוסח לדוגמה, שנכתב לצורך הדגמת הפרויקט ואינו מהווה ייעוץ משפטי.
+          </p>
+          <div className="space-y-6">
+            {doc.sections.map((s, i) => (
+              <section key={s.h}>
+                <h3 className="text-[17px] font-bold text-[#0F1B2D]">
+                  {i + 1}. {s.h}
+                </h3>
+                {s.p.map((t) => (
+                  <p key={t} className="mt-2 max-w-[65ch] leading-relaxed text-[#2B3138]">
+                    {t}
+                  </p>
+                ))}
+              </section>
+            ))}
+          </div>
+        </div>
+        <div className="border-t border-[#ECE7DF] px-6 py-4 sm:px-8">
+          <button type="button" onClick={onClose} className={`${ctaClass} w-full sm:w-auto`}>
+            הבנתי, סגירה
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Accessibility widget ---------- */
+
+const A11Y_DEFAULT = { scale: 1, contrast: false, links: false, still: false };
+
+function Switch({ id, label, icon: Icon, checked, onChange }) {
+  return (
+    <button
+      id={id}
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={`flex w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-[15px] font-medium transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#9A7B4F] ${
+        checked ? "border-[#0F1B2D] bg-[#0F1B2D]/[0.05] text-[#0F1B2D]" : "border-[#DDD6CB] text-[#2B3138] hover:border-[#2B3138]/40"
+      }`}
+    >
+      <span className="flex items-center gap-2.5">
+        <Icon className="h-4 w-4" /> {label}
+      </span>
+      <span className={`relative h-6 w-11 shrink-0 rounded-full transition ${checked ? "bg-[#0F1B2D]" : "bg-[#DDD6CB]"}`}>
+        <span className={`absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all ${checked ? "right-6" : "right-1"}`} />
+      </span>
+    </button>
+  );
+}
+
+function A11yWidget({ prefs, setPrefs, onStatement }) {
+  const [open, setOpen] = useState(false);
+  const panelRef = useRef(null);
+  const set = (k, v) => setPrefs((p) => ({ ...p, [k]: v }));
+  const step = (d) => set("scale", Math.min(1.4, Math.max(0.9, Math.round((prefs.scale + d) * 100) / 100)));
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const onKey = (e) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("keydown", onKey);
+    panelRef.current?.querySelector("button")?.focus();
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
+  return (
+    <div className="fixed bottom-4 left-4 z-[60]" dir="rtl">
+      {open && (
+        <div
+          ref={panelRef}
+          id="a11y-panel"
+          role="dialog"
+          aria-label="תפריט נגישות"
+          className="absolute bottom-16 left-0 w-[min(20rem,calc(100vw-2rem))] rounded-[24px] border border-[#DDD6CB] bg-white p-5 shadow-[0_30px_70px_-30px_rgba(15,27,45,0.55)]"
+        >
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-bold text-[#0F1B2D]">נגישות</p>
+            <button type="button" onClick={() => setOpen(false)} aria-label="סגירת תפריט הנגישות" className="rounded-full p-1.5 text-[#2B3138] hover:bg-[#F7F5F1]">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="mt-4 rounded-2xl border border-[#DDD6CB] px-4 py-3">
+            <p className="text-[15px] font-medium text-[#2B3138]">גודל טקסט</p>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <button type="button" onClick={() => step(-0.1)} disabled={prefs.scale <= 0.9} aria-label="הקטנת טקסט" className="flex h-10 w-10 items-center justify-center rounded-full border border-[#DDD6CB] text-[#0F1B2D] transition hover:bg-[#F7F5F1] disabled:opacity-40">
+                <Minus className="h-4 w-4" />
+              </button>
+              <span className="text-lg font-bold tabular-nums text-[#0F1B2D]" aria-live="polite">
+                {Math.round(prefs.scale * 100)}%
+              </span>
+              <button type="button" onClick={() => step(0.1)} disabled={prefs.scale >= 1.4} aria-label="הגדלת טקסט" className="flex h-10 w-10 items-center justify-center rounded-full border border-[#DDD6CB] text-[#0F1B2D] transition hover:bg-[#F7F5F1] disabled:opacity-40">
+                <Plus className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-3 space-y-2">
+            <Switch id="a11y-contrast" label="ניגודיות גבוהה" icon={Contrast} checked={prefs.contrast} onChange={(v) => set("contrast", v)} />
+            <Switch id="a11y-links" label="הדגשת קישורים" icon={Link2} checked={prefs.links} onChange={(v) => set("links", v)} />
+            <Switch id="a11y-still" label="עצירת אנימציות" icon={Pause} checked={prefs.still} onChange={(v) => set("still", v)} />
+          </div>
+
+          <div className="mt-4 flex items-center justify-between gap-3 text-[14px]">
+            <button type="button" onClick={() => setPrefs(A11Y_DEFAULT)} className="inline-flex items-center gap-1.5 font-semibold text-[#2B3138] hover:text-[#0F1B2D]">
+              <RotateCcw className="h-4 w-4" /> איפוס
+            </button>
+            <button type="button" data-link onClick={() => { setOpen(false); onStatement(); }} className="font-semibold text-[#0F1B2D] underline underline-offset-4">
+              הצהרת נגישות
+            </button>
+          </div>
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-controls="a11y-panel"
+        aria-label={open ? "סגירת תפריט הנגישות" : "פתיחת תפריט הנגישות"}
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-l from-[#0F1B2D] to-[#3A4A5E] text-white shadow-[0_12px_30px_-8px_rgba(15,27,45,0.6)] transition hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9A7B4F]"
+      >
+        <Accessibility className="h-7 w-7" strokeWidth={1.8} />
+      </button>
+    </div>
+  );
+}
+
+/* ---------- Cookie consent ---------- */
+
+const COOKIE_KEY = "aura-cookie-consent";
+const COOKIE_TYPES = [
+  { key: "necessary", label: "עוגיות חיוניות", hint: "נדרשות לתפקוד האתר ולשמירת ההעדפות שלכם", locked: true },
+  { key: "analytics", label: "סטטיסטיקה", hint: "עוזרות לנו להבין איך משתמשים באתר" },
+  { key: "marketing", label: "שיווק", hint: "התאמת פרסומות ומדידת קמפיינים" },
+];
+
+function CookieBanner({ open, settingsFirst, onDone, onPrivacy }) {
+  const [settings, setSettings] = useState(settingsFirst);
+  const [choice, setChoice] = useState(() => loadPref(COOKIE_KEY, { necessary: true, analytics: false, marketing: false }));
+
+  useEffect(() => setSettings(settingsFirst), [settingsFirst, open]);
+  if (!open) return null;
+
+  const save = (value) => {
+    const record = { ...value, necessary: true, savedAt: new Date().toISOString() };
+    savePref(COOKIE_KEY, record);
+    onDone(record);
+  };
+
+  return (
+    <div className="fixed bottom-20 left-4 right-4 z-[55] sm:bottom-4 sm:left-24 md:right-auto md:max-w-[480px]" dir="rtl" role="region" aria-label="הסכמה לשימוש בעוגיות">
+      <div className="rounded-[24px] border border-stone-200/60 bg-white/90 p-5 shadow-[0_30px_70px_-30px_rgba(15,27,45,0.55)] backdrop-blur-md">
+        <div className="flex items-start gap-3">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ECE7DF] text-[#7A5F38]">
+            <Cookie className="h-5 w-5" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-bold text-[#0F1B2D]">אנו משתמשים בעוגיות כדי להבטיח את החוויה הטובה ביותר באתר</p>
+            <p className="mt-1 text-[13px] leading-relaxed text-[#6B6760]">
+              אפשר לאשר את כולן או לבחור אילו להפעיל.{" "}
+              <button type="button" data-link onClick={onPrivacy} className="font-semibold text-[#0F1B2D] underline underline-offset-2">
+                מדיניות פרטיות
+              </button>
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => save({ analytics: false, marketing: false })}
+            aria-label="סגירה (עוגיות חיוניות בלבד)"
+            className="rounded-full p-1.5 text-[#6B6760] hover:bg-[#F7F5F1]"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {settings && (
+          <ul className="mt-4 space-y-2">
+            {COOKIE_TYPES.map((t) => (
+              <li key={t.key} className="flex items-center justify-between gap-3 rounded-2xl border border-[#ECE7DF] px-4 py-3">
+                <div className="min-w-0">
+                  <p className="flex items-center gap-1.5 text-[14px] font-semibold text-[#2B3138]">
+                    {t.label} {t.locked && <Lock className="h-3.5 w-3.5 text-[#6B6760]" />}
+                  </p>
+                  <p className="text-[12px] text-[#6B6760]">{t.hint}</p>
+                </div>
+                <input
+                  id={`cookie-${t.key}`}
+                  type="checkbox"
+                  aria-label={t.label}
+                  checked={t.locked ? true : !!choice[t.key]}
+                  disabled={t.locked}
+                  onChange={(e) => setChoice((c) => ({ ...c, [t.key]: e.target.checked }))}
+                  className="h-5 w-5 shrink-0 accent-[#0F1B2D]"
+                />
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button type="button" onClick={() => save({ analytics: true, marketing: true })} className={`${ctaClass} !px-6 !py-3`}>
+            אישור והסכמה
+          </button>
+          {settings ? (
+            <button type="button" onClick={() => save(choice)} className={`${ghostClass} !py-3`}>
+              שמירת ההעדפות
+            </button>
+          ) : (
+            <button type="button" onClick={() => setSettings(true)} className={`${ghostClass} !py-3`}>
+              הגדרות
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ---------- Page ---------- */
 
 export default function AuraTowers() {
   const [menu, setMenu] = useState(false);
   const [price, setPrice] = useState(4_850_000);
   const [pickedRooms, setPickedRooms] = useState(null);
+  const [legal, setLegal] = useState(null);
+  const [a11y, setA11y] = useState(A11Y_DEFAULT);
+  const [cookie, setCookie] = useState({ open: false, settings: false });
+
+  useEffect(() => {
+    setA11y(loadPref("aura-a11y", A11Y_DEFAULT));
+    const saved = loadPref(COOKIE_KEY, null);
+    if (!saved || !saved.savedAt) setCookie({ open: true, settings: false });
+  }, []);
+  useEffect(() => savePref("aura-a11y", a11y), [a11y]);
 
   const pickUnit = (u) => {
     setPrice(u.price);
@@ -849,7 +1309,11 @@ export default function AuraTowers() {
   ];
 
   return (
-    <div dir="rtl" lang="he" className="aura min-h-screen overflow-x-hidden bg-[#F7F5F1] text-[#2B3138] antialiased">
+    <div
+      dir="rtl"
+      lang="he"
+      className={`aura min-h-screen overflow-x-hidden bg-[#F7F5F1] text-[#2B3138] antialiased ${a11y.contrast ? "hc" : ""} ${a11y.links ? "hl" : ""} ${a11y.still ? "still" : ""}`}
+    >
       <style>{`
         .aura, .aura button, .aura input { font-family: 'Assistant', 'Arial Hebrew', Arial, sans-serif; }
         @keyframes aura-spin { to { transform: rotate(360deg); } }
@@ -863,7 +1327,25 @@ export default function AuraTowers() {
         .aura-range::-webkit-slider-thumb:hover { transform: scale(1.12); }
         .aura-range::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff;
           border: 2px solid #0F1B2D; box-shadow: 0 4px 12px -2px rgba(15,27,45,.35); }
+        @keyframes aura-ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
+        .aura-ping { animation: aura-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+        .aura-scroll { scrollbar-width: none; }
+        .aura-scroll::-webkit-scrollbar { display: none; }
+        @media (prefers-reduced-motion: reduce) { .aura-ping { animation: none; } }
+
+        /* Accessibility modes */
+        .aura.still *, .aura.still *::before, .aura.still *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+        .aura.hl a, .aura.hl [data-link] { text-decoration: underline !important; text-decoration-thickness: 2px !important;
+          text-underline-offset: 4px; outline: 2px dashed #9A7B4F; outline-offset: 3px; }
+        .aura.hc, .aura.hc [class*="bg-[#F7F5F1]"], .aura.hc [class*="bg-[#ECE7DF]"], .aura.hc [class*="bg-white"] { background-color: #fff !important; }
+        .aura.hc [class*="text-[#6B6760]"], .aura.hc [class*="text-[#2B3138]"], .aura.hc [class*="text-[#0F1B2D]"],
+        .aura.hc [class*="text-[#7A5F38]"], .aura.hc [class*="text-[#9A7B4F]"] { color: #000 !important; }
+        .aura.hc [class*="border-[#DDD6CB]"], .aura.hc [class*="border-[#ECE7DF]"], .aura.hc [class*="border-stone-200"] { border-color: #000 !important; }
+        .aura.hc footer, .aura.hc footer * { background-color: #000 !important; color: #fff !important; }
+        .aura.hc :focus-visible { outline: 3px solid #000 !important; outline-offset: 3px; }
       `}</style>
+
+      <div style={{ zoom: a11y.scale }}>
 
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-[#DDD6CB]/70 bg-[#F7F5F1]/85 backdrop-blur-md">
@@ -944,16 +1426,7 @@ export default function AuraTowers() {
             </dl>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[460px]">
-            <TowersArt />
-            <div className="absolute -bottom-8 -left-2 sm:-left-8">
-              <TrustBadge />
-            </div>
-            <div className="absolute right-4 top-4 rounded-2xl border border-white/60 bg-white/80 px-4 py-3 shadow-[0_10px_30px_-15px_rgba(15,27,45,0.4)] backdrop-blur">
-              <p className="text-[12px] text-[#6B6760]">פנטהאוז קומה 34</p>
-              <p className="text-[15px] font-bold text-[#0F1B2D]">236 מ״ר + 95 מ״ר גג</p>
-            </div>
-          </div>
+          <HeroShowcase onPick={pickUnit} />
         </div>
       </section>
 
@@ -1001,7 +1474,7 @@ export default function AuraTowers() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-[#0F1B2D] px-4 py-14 text-[#C9CDD3] sm:px-8">
+      <footer className="bg-[#0F1B2D] px-4 pb-24 pt-14 text-[#C9CDD3] sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-[17px] font-extrabold tracking-[0.22em] text-white" dir="ltr">
@@ -1016,10 +1489,47 @@ export default function AuraTowers() {
               <Phone className="h-4 w-4 text-[#C9A86E]" />
               <span dir="ltr" className="text-lg font-semibold tabular-nums">*5520</span>
             </p>
-            <p className="text-[13px] text-[#8D96A3]">ההדמיות והנתונים להמחשה בלבד. © 2026 Aura Towers</p>
           </div>
         </div>
+        <div className="mx-auto mt-10 flex max-w-6xl flex-col gap-4 border-t border-white/10 pt-6 text-[14px] md:flex-row md:items-center md:justify-between">
+          <nav aria-label="מסמכים משפטיים" className="flex flex-wrap gap-x-6 gap-y-2">
+            {[
+              ["terms", "תקנון ותנאי שימוש"],
+              ["privacy", "מדיניות פרטיות"],
+              ["a11y", "הצהרת נגישות"],
+            ].map(([key, label]) => (
+              <button
+                key={key}
+                type="button"
+                data-link
+                onClick={() => setLegal(key)}
+                className="inline-flex items-center gap-1.5 text-[#C9CDD3] transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A86E]"
+              >
+                <FileText className="h-3.5 w-3.5 text-[#C9A86E]" /> {label}
+              </button>
+            ))}
+            <button
+              type="button"
+              data-link
+              onClick={() => setCookie({ open: true, settings: true })}
+              className="inline-flex items-center gap-1.5 text-[#C9CDD3] transition hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A86E]"
+            >
+              <Cookie className="h-3.5 w-3.5 text-[#C9A86E]" /> הגדרות עוגיות
+            </button>
+          </nav>
+          <p className="text-[13px] text-[#8D96A3]">ההדמיות והנתונים להמחשה בלבד. © 2026 Aura Towers</p>
+        </div>
       </footer>
+      </div>
+
+      <A11yWidget prefs={a11y} setPrefs={setA11y} onStatement={() => setLegal("a11y")} />
+      <CookieBanner
+        open={cookie.open}
+        settingsFirst={cookie.settings}
+        onDone={() => setCookie({ open: false, settings: false })}
+        onPrivacy={() => setLegal("privacy")}
+      />
+      <LegalDialog docKey={legal} onClose={() => setLegal(null)} />
     </div>
   );
 }
