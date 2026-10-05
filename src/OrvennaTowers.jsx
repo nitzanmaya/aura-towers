@@ -119,7 +119,7 @@ function RangeField({ id, label, value, min, max, step, onChange, display }) {
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="aura-range w-full"
+        className="orvenna-range w-full"
         style={{ "--pct": `${pct}%` }}
       />
     </div>
@@ -273,14 +273,14 @@ function TrustBadge({ size = 148 }) {
     <div className="relative" style={{ width: size, height: size }}>
       <svg
         viewBox="0 0 200 200"
-        className="aura-spin h-full w-full drop-shadow-[0_12px_24px_rgba(15,27,45,0.18)]"
+        className="orvenna-spin h-full w-full drop-shadow-[0_12px_24px_rgba(15,27,45,0.18)]"
         aria-hidden="true"
         direction="ltr"
         shapeRendering="geometricPrecision"
         textRendering="geometricPrecision"
       >
         <defs>
-          <path id="aura-badge-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
+          <path id="orvenna-badge-circle" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
         </defs>
         <circle cx="100" cy="100" r="99" fill="#FBFAF7" />
         <circle cx="100" cy="100" r="96.5" fill="none" stroke="#0F1B2D" strokeWidth="0.6" />
@@ -289,7 +289,7 @@ function TrustBadge({ size = 148 }) {
         <circle cx="100" cy="100" r="61" fill="none" stroke="#9A7B4F" strokeWidth="0.4" strokeOpacity="0.7" />
         <text fill="#0F1B2D" fontSize="10.5" fontWeight="400" fontFamily="Assistant, sans-serif">
           {/* One pass stretched to the full circumference (2π·78 ≈ 490) so the loop is seamless */}
-          <textPath href="#aura-badge-circle" startOffset="0" textLength="486" lengthAdjust="spacing">
+          <textPath href="#orvenna-badge-circle" startOffset="0" textLength="486" lengthAdjust="spacing">
             • ORVENNA TOWERS • ARCHITECTURAL MASTERPIECE • HERZLIYA PITUACH
           </textPath>
         </text>
@@ -328,7 +328,7 @@ function Hotspot({ spot, open, onToggle, onPick }) {
         style={{ left: `${spot.x}%`, top: `${spot.y}%` }}
       >
         <span className="relative flex h-9 w-9 items-center justify-center">
-          <span className="aura-ping absolute inline-flex h-full w-full rounded-full bg-white/70" />
+          <span className="orvenna-ping absolute inline-flex h-full w-full rounded-full bg-white/70" />
           <span className="absolute inline-flex h-9 w-9 rounded-full border border-white/70 bg-white/20 backdrop-blur-md" />
           <span className={`relative h-3 w-3 rounded-full ring-2 ring-white transition ${open ? "bg-[#0F1B2D]" : "bg-[#B8945A]"}`} />
         </span>
@@ -341,7 +341,7 @@ function Hotspot({ spot, open, onToggle, onPick }) {
           id={`spot-${spot.id}`}
           role="dialog"
           aria-label={spot.label}
-          className="aura-pop absolute z-20 w-[min(16rem,80%)] rounded-[20px] border border-stone-200/60 bg-white/85 p-4 shadow-[0_30px_60px_-25px_rgba(15,27,45,0.65)] backdrop-blur-xl"
+          className="orvenna-pop absolute z-20 w-[min(16rem,80%)] rounded-[20px] border border-stone-200/60 bg-white/85 p-4 shadow-[0_30px_60px_-25px_rgba(15,27,45,0.65)] backdrop-blur-xl"
           style={{ top: `calc(${spot.y}% + 28px)`, ...side }}
         >
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#7A5F38]">{unit.tower}</p>
@@ -414,14 +414,14 @@ function HeroShowcase({ onPick }) {
       <div className="pointer-events-none absolute -bottom-8 -right-4 h-40 w-40 sm:-right-10" aria-hidden="true">
         <div data-parallax="0.1" className="h-full w-full rounded-[28px] border border-[#9A7B4F]/45" />
       </div>
-      <figure data-tilt className="aura-tilt relative aspect-[4/5] w-full max-w-full overflow-hidden rounded-[32px] border border-stone-200/50 bg-[#D9D2C6] shadow-[0_40px_90px_-45px_rgba(15,27,45,0.6)]">
+      <figure data-tilt className="orvenna-tilt relative aspect-[4/5] w-full max-w-full overflow-hidden rounded-[32px] border border-stone-200/50 bg-[#D9D2C6] shadow-[0_40px_90px_-45px_rgba(15,27,45,0.6)]">
         <div className="absolute inset-y-0 left-[14%] right-[14%]" style={{ ...glass, clipPath: "polygon(16% 0, 84% 0, 100% 100%, 0 100%)" }} aria-hidden="true" />
         {photo && (
           <div data-parallax="-0.12" className="absolute -inset-y-[8%] inset-x-0">
           <img
             src={HERO_PHOTO}
             alt="מגדל מגורים מודרני עם מרפסות על רקע שמיים כחולים"
-            className="aura-kenburns absolute inset-0 h-full w-full object-cover"
+            className="orvenna-kenburns absolute inset-0 h-full w-full object-cover"
             loading="eager"
             fetchpriority="high"
             onError={() => setPhoto(false)}
@@ -431,8 +431,8 @@ function HeroShowcase({ onPick }) {
         {/* Material grading: warm bronze tone, glass sheen, brass edge */}
         <div className="pointer-events-none absolute inset-0 bg-[#9A7B4F]/25 mix-blend-soft-light" aria-hidden="true" />
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#1C160F]/55 via-transparent to-[#F7F5F1]/15" aria-hidden="true" />
-        <div className="aura-sheen pointer-events-none absolute inset-0 mix-blend-overlay" aria-hidden="true" />
-        <div className="aura-glare pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="orvenna-sheen pointer-events-none absolute inset-0 mix-blend-overlay" aria-hidden="true" />
+        <div className="orvenna-glare pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-l from-[#7A5F38] via-[#D8BC86] to-[#7A5F38]" aria-hidden="true" />
 
         {HOTSPOTS.map((s) => (
@@ -1375,7 +1375,7 @@ function A11yWidget({ prefs, setPrefs, onStatement }) {
 
 /* ---------- Cookie consent ---------- */
 
-const COOKIE_KEY = "aura-cookie-consent";
+const COOKIE_KEY = "orvenna-cookie-consent";
 const COOKIE_TYPES = [
   { key: "necessary", label: "עוגיות חיוניות", hint: "נדרשות לתפקוד האתר ולשמירת ההעדפות שלכם", locked: true },
   { key: "analytics", label: "סטטיסטיקה", hint: "עוזרות לנו להבין איך משתמשים באתר" },
@@ -1512,7 +1512,7 @@ function StickyCta() {
   );
 }
 
-export default function AuraTowers() {
+export default function OrvennaTowers() {
   const [menu, setMenu] = useState(false);
   const [price, setPrice] = useState(4_850_000);
   const [pickedRooms, setPickedRooms] = useState(null);
@@ -1522,11 +1522,11 @@ export default function AuraTowers() {
   const rootRef = useRef(null);
 
   useEffect(() => {
-    setA11y(loadPref("aura-a11y", A11Y_DEFAULT));
+    setA11y(loadPref("orvenna-a11y", A11Y_DEFAULT));
     const saved = loadPref(COOKIE_KEY, null);
     if (!saved || !saved.savedAt) setCookie({ open: true, settings: false });
   }, []);
-  useEffect(() => savePref("aura-a11y", a11y), [a11y]);
+  useEffect(() => savePref("orvenna-a11y", a11y), [a11y]);
   const motion = useMotionFX(rootRef, !a11y.still);
 
   const pickUnit = (u) => {
@@ -1552,84 +1552,84 @@ export default function AuraTowers() {
       dir="rtl"
       lang="he"
       ref={rootRef}
-      className={`aura ${motion ? "motion" : ""} min-h-screen overflow-x-hidden bg-[#F7F5F1] text-[#2B3138] antialiased ${a11y.contrast ? "hc" : ""} ${a11y.links ? "hl" : ""} ${a11y.still ? "still" : ""}`}
+      className={`orvenna ${motion ? "motion" : ""} min-h-screen overflow-x-hidden bg-[#F7F5F1] text-[#2B3138] antialiased ${a11y.contrast ? "hc" : ""} ${a11y.links ? "hl" : ""} ${a11y.still ? "still" : ""}`}
     >
       <style>{`
-        .aura, .aura button, .aura input { font-family: 'Assistant', 'Arial Hebrew', Arial, sans-serif; }
-        @keyframes aura-spin { to { transform: rotate(360deg); } }
-        .aura-spin { animation: aura-spin 48s linear infinite; transform-origin: 50% 50%; }
-        @media (prefers-reduced-motion: reduce) { .aura-spin { animation: none; } }
-        .aura-range { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 999px; cursor: pointer;
+        .orvenna, .orvenna button, .orvenna input { font-family: 'Assistant', 'Arial Hebrew', Arial, sans-serif; }
+        @keyframes orvenna-spin { to { transform: rotate(360deg); } }
+        .orvenna-spin { animation: orvenna-spin 48s linear infinite; transform-origin: 50% 50%; }
+        @media (prefers-reduced-motion: reduce) { .orvenna-spin { animation: none; } }
+        .orvenna-range { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 999px; cursor: pointer;
           background: linear-gradient(to left, #0F1B2D 0, #3A4A5E var(--pct), #E4DED4 var(--pct)); }
-        .aura-range:focus-visible { outline: 2px solid #9A7B4F; outline-offset: 6px; }
-        .aura-range::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
+        .orvenna-range:focus-visible { outline: 2px solid #9A7B4F; outline-offset: 6px; }
+        .orvenna-range::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; border-radius: 50%;
           background: #fff; border: 2px solid #0F1B2D; box-shadow: 0 4px 12px -2px rgba(15,27,45,.35); transition: transform .15s; }
-        .aura-range::-webkit-slider-thumb:hover { transform: scale(1.12); }
-        .aura-range::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff;
+        .orvenna-range::-webkit-slider-thumb:hover { transform: scale(1.12); }
+        .orvenna-range::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff;
           border: 2px solid #0F1B2D; box-shadow: 0 4px 12px -2px rgba(15,27,45,.35); }
-        @keyframes aura-ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
-        .aura-ping { animation: aura-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
-        .aura-scroll { scrollbar-width: none; }
-        .aura-scroll::-webkit-scrollbar { display: none; }
-        @keyframes aura-pop { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
-        .aura-pop { animation: aura-pop .22s ease-out; }
-        @keyframes aura-kenburns { from { transform: scale(1.04); } to { transform: scale(1.12) translateY(-1.5%); } }
-        .aura-kenburns { animation: aura-kenburns 24s ease-in-out infinite alternate; }
-        @keyframes aura-sheen-move { 0%, 55% { background-position: 160% 0; } 100% { background-position: -60% 0; } }
-        .aura-sheen { background: linear-gradient(115deg, transparent 35%, rgba(255,240,215,.55) 50%, transparent 65%) no-repeat;
-          background-size: 220% 100%; animation: aura-sheen-move 9s ease-in-out infinite; }
-        .aura-cta { position: relative; isolation: isolate; }
-        .aura-cta::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #0F1B2D; z-index: -1;
-          animation: aura-halo 2.8s ease-out infinite; }
-        @keyframes aura-halo { 0% { transform: scale(1); opacity: .35; } 70%, 100% { transform: scale(1.12, 1.4); opacity: 0; } }
-        .aura-shine { position: relative; overflow: hidden; }
-        .aura-shine::after { content: ""; position: absolute; inset: 0; transform: translateX(-130%);
-          background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.3) 50%, transparent 70%); animation: aura-shine 5s ease-in-out infinite; }
-        @keyframes aura-shine { 0%, 65% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
-        @media (prefers-reduced-motion: reduce) { .aura-ping, .aura-kenburns, .aura-sheen, .aura-cta::before, .aura-shine::after, .aura-pop { animation: none; } }
-        .aura.hc .aura-gold { background: none; color: #000; }
+        @keyframes orvenna-ping { 75%, 100% { transform: scale(2.2); opacity: 0; } }
+        .orvenna-ping { animation: orvenna-ping 2.2s cubic-bezier(0, 0, 0.2, 1) infinite; }
+        .orvenna-scroll { scrollbar-width: none; }
+        .orvenna-scroll::-webkit-scrollbar { display: none; }
+        @keyframes orvenna-pop { from { opacity: 0; transform: translateY(6px) scale(.97); } to { opacity: 1; transform: none; } }
+        .orvenna-pop { animation: orvenna-pop .22s ease-out; }
+        @keyframes orvenna-kenburns { from { transform: scale(1.04); } to { transform: scale(1.12) translateY(-1.5%); } }
+        .orvenna-kenburns { animation: orvenna-kenburns 24s ease-in-out infinite alternate; }
+        @keyframes orvenna-sheen-move { 0%, 55% { background-position: 160% 0; } 100% { background-position: -60% 0; } }
+        .orvenna-sheen { background: linear-gradient(115deg, transparent 35%, rgba(255,240,215,.55) 50%, transparent 65%) no-repeat;
+          background-size: 220% 100%; animation: orvenna-sheen-move 9s ease-in-out infinite; }
+        .orvenna-cta { position: relative; isolation: isolate; }
+        .orvenna-cta::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #0F1B2D; z-index: -1;
+          animation: orvenna-halo 2.8s ease-out infinite; }
+        @keyframes orvenna-halo { 0% { transform: scale(1); opacity: .35; } 70%, 100% { transform: scale(1.12, 1.4); opacity: 0; } }
+        .orvenna-shine { position: relative; overflow: hidden; }
+        .orvenna-shine::after { content: ""; position: absolute; inset: 0; transform: translateX(-130%);
+          background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.3) 50%, transparent 70%); animation: orvenna-shine 5s ease-in-out infinite; }
+        @keyframes orvenna-shine { 0%, 65% { transform: translateX(-130%); } 100% { transform: translateX(130%); } }
+        @media (prefers-reduced-motion: reduce) { .orvenna-ping, .orvenna-kenburns, .orvenna-sheen, .orvenna-cta::before, .orvenna-shine::after, .orvenna-pop { animation: none; } }
+        .orvenna.hc .orvenna-gold { background: none; color: #000; }
 
         /* Motion: scroll reveals, headline rise, parallax, tilt (only when .motion is on) */
-        .aura-line { display: block; overflow: hidden; padding-bottom: .08em; }
-        .aura-line > span { display: inline-block; }
-        .aura.motion .aura-line > span { animation: aura-rise 1.1s cubic-bezier(.16,1,.3,1) both; animation-delay: calc(var(--d, 0) * 140ms + 100ms); }
-        @keyframes aura-rise { from { transform: translateY(105%); opacity: 0; } to { transform: none; opacity: 1; } }
-        .aura.motion [data-intro] { animation: aura-fade-up 1s cubic-bezier(.16,1,.3,1) both; animation-delay: calc(var(--d, 0) * 120ms + 150ms); }
-        @keyframes aura-fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
-        .aura.motion [data-reveal] { opacity: 0; transform: translateY(36px); filter: blur(4px);
+        .orvenna-line { display: block; overflow: hidden; padding-bottom: .08em; }
+        .orvenna-line > span { display: inline-block; }
+        .orvenna.motion .orvenna-line > span { animation: orvenna-rise 1.1s cubic-bezier(.16,1,.3,1) both; animation-delay: calc(var(--d, 0) * 140ms + 100ms); }
+        @keyframes orvenna-rise { from { transform: translateY(105%); opacity: 0; } to { transform: none; opacity: 1; } }
+        .orvenna.motion [data-intro] { animation: orvenna-fade-up 1s cubic-bezier(.16,1,.3,1) both; animation-delay: calc(var(--d, 0) * 120ms + 150ms); }
+        @keyframes orvenna-fade-up { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+        .orvenna.motion [data-reveal] { opacity: 0; transform: translateY(36px); filter: blur(4px);
           transition: opacity .9s cubic-bezier(.16,1,.3,1), transform .9s cubic-bezier(.16,1,.3,1), filter .9s ease;
           transition-delay: calc(var(--d, 0) * 110ms); }
-        .aura.motion [data-reveal].is-in { opacity: 1; transform: none; filter: none; }
-        .aura-gold { background: linear-gradient(100deg, #7A5F38 0%, #B8945A 35%, #E6CF9F 50%, #B8945A 65%, #7A5F38 100%);
+        .orvenna.motion [data-reveal].is-in { opacity: 1; transform: none; filter: none; }
+        .orvenna-gold { background: linear-gradient(100deg, #7A5F38 0%, #B8945A 35%, #E6CF9F 50%, #B8945A 65%, #7A5F38 100%);
           background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .aura.motion .aura-gold { animation: aura-gold 7s ease-in-out infinite; }
-        @keyframes aura-gold { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
-        .aura-outline { color: transparent; -webkit-text-stroke: 1px rgba(15,27,45,.28); }
-        .aura-outline-soft { -webkit-text-stroke-color: rgba(154,123,79,.38); }
-        .aura-tilt { transform-style: preserve-3d; transition: transform .6s cubic-bezier(.16,1,.3,1); will-change: transform; }
-        .aura-glare { opacity: 0; transition: opacity .4s; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255,246,228,.35), transparent 45%); }
-        .aura.motion .aura-tilt:hover .aura-glare { opacity: 1; }
-        .aura-progress { transform: scaleX(var(--sp, 0)); }
-        .aura:not(.motion) .aura-progress { display: none; }
+        .orvenna.motion .orvenna-gold { animation: orvenna-gold 7s ease-in-out infinite; }
+        @keyframes orvenna-gold { 0%, 100% { background-position: 100% 0; } 50% { background-position: 0 0; } }
+        .orvenna-outline { color: transparent; -webkit-text-stroke: 1px rgba(15,27,45,.28); }
+        .orvenna-outline-soft { -webkit-text-stroke-color: rgba(154,123,79,.38); }
+        .orvenna-tilt { transform-style: preserve-3d; transition: transform .6s cubic-bezier(.16,1,.3,1); will-change: transform; }
+        .orvenna-glare { opacity: 0; transition: opacity .4s; background: radial-gradient(circle at var(--gx, 50%) var(--gy, 30%), rgba(255,246,228,.35), transparent 45%); }
+        .orvenna.motion .orvenna-tilt:hover .orvenna-glare { opacity: 1; }
+        .orvenna-progress { transform: scaleX(var(--sp, 0)); }
+        .orvenna:not(.motion) .orvenna-progress { display: none; }
         [data-parallax], [data-drift] { will-change: transform; }
 
         /* Accessibility modes */
-        .aura.still *, .aura.still *::before, .aura.still *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
-        .aura.hl a, .aura.hl [data-link] { text-decoration: underline !important; text-decoration-thickness: 2px !important;
+        .orvenna.still *, .orvenna.still *::before, .orvenna.still *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+        .orvenna.hl a, .orvenna.hl [data-link] { text-decoration: underline !important; text-decoration-thickness: 2px !important;
           text-underline-offset: 4px; outline: 2px dashed #9A7B4F; outline-offset: 3px; }
-        .aura.hc, .aura.hc [class*="bg-[#F7F5F1]"], .aura.hc [class*="bg-[#ECE7DF]"], .aura.hc [class*="bg-white"] { background-color: #fff !important; }
-        .aura.hc [class*="text-[#6B6760]"], .aura.hc [class*="text-[#2B3138]"], .aura.hc [class*="text-[#0F1B2D]"],
-        .aura.hc [class*="text-[#7A5F38]"], .aura.hc [class*="text-[#9A7B4F]"] { color: #000 !important; }
-        .aura.hc [class*="border-[#DDD6CB]"], .aura.hc [class*="border-[#ECE7DF]"], .aura.hc [class*="border-stone-200"] { border-color: #000 !important; }
-        .aura.hc footer, .aura.hc footer * { background-color: #000 !important; color: #fff !important; }
-        .aura.hc :focus-visible { outline: 3px solid #000 !important; outline-offset: 3px; }
+        .orvenna.hc, .orvenna.hc [class*="bg-[#F7F5F1]"], .orvenna.hc [class*="bg-[#ECE7DF]"], .orvenna.hc [class*="bg-white"] { background-color: #fff !important; }
+        .orvenna.hc [class*="text-[#6B6760]"], .orvenna.hc [class*="text-[#2B3138]"], .orvenna.hc [class*="text-[#0F1B2D]"],
+        .orvenna.hc [class*="text-[#7A5F38]"], .orvenna.hc [class*="text-[#9A7B4F]"] { color: #000 !important; }
+        .orvenna.hc [class*="border-[#DDD6CB]"], .orvenna.hc [class*="border-[#ECE7DF]"], .orvenna.hc [class*="border-stone-200"] { border-color: #000 !important; }
+        .orvenna.hc footer, .orvenna.hc footer * { background-color: #000 !important; color: #fff !important; }
+        .orvenna.hc :focus-visible { outline: 3px solid #000 !important; outline-offset: 3px; }
       `}</style>
 
       <div style={{ zoom: a11y.scale }}>
 
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-[#DDD6CB]/70 bg-[#F7F5F1]/85 backdrop-blur-md">
-        <span aria-hidden="true" className="aura-progress absolute inset-x-0 bottom-[-1px] h-[2px] origin-right bg-gradient-to-l from-[#7A5F38] via-[#D8BC86] to-[#0F1B2D]" />
+        <span aria-hidden="true" className="orvenna-progress absolute inset-x-0 bottom-[-1px] h-[2px] origin-right bg-gradient-to-l from-[#7A5F38] via-[#D8BC86] to-[#0F1B2D]" />
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-8">
           <a href="#top" className="flex items-center gap-2.5">
             <Building2 className="h-6 w-6 text-[#0F1B2D]" strokeWidth={1.5} />
@@ -1644,7 +1644,7 @@ export default function AuraTowers() {
               </a>
             ))}
           </nav>
-          <a href="#quiz" className={`${ctaClass} aura-shine hidden !bg-none !bg-[#0F1B2D] !px-5 !py-2.5 ring-1 ring-[#9A7B4F]/40 md:inline-flex`}>
+          <a href="#quiz" className={`${ctaClass} orvenna-shine hidden !bg-none !bg-[#0F1B2D] !px-5 !py-2.5 ring-1 ring-[#9A7B4F]/40 md:inline-flex`}>
             תיאום פגישה
           </a>
           <button
@@ -1670,7 +1670,7 @@ export default function AuraTowers() {
 
       {/* Brand band under the header, drifts sideways with scroll */}
       <div aria-hidden="true" className="pointer-events-none select-none overflow-hidden pt-6 sm:pt-8">
-        <p data-drift="-0.5" dir="ltr" className="aura-outline aura-outline-soft whitespace-nowrap text-[52px] font-extrabold leading-none tracking-[0.08em] sm:text-[96px]">
+        <p data-drift="-0.5" dir="ltr" className="orvenna-outline orvenna-outline-soft whitespace-nowrap text-[52px] font-extrabold leading-none tracking-[0.08em] sm:text-[96px]">
           ORVENNA TOWERS · HERZLIYA PITUACH · ORVENNA TOWERS · HERZLIYA PITUACH · ORVENNA TOWERS
         </p>
       </div>
@@ -1683,10 +1683,10 @@ export default function AuraTowers() {
               <MapPin className="h-4 w-4 text-[#9A7B4F]" /> שדרות הים, הרצליה פיתוח · אכלוס 2028
             </p>
             <h1 className="mt-5 text-[44px] font-bold leading-[1.05] tracking-tight text-[#0F1B2D] [text-wrap:balance] sm:text-6xl lg:text-[76px]">
-              <span className="aura-line"><span style={{ "--d": 0 }}>לגור מעל הכל.</span></span>
-              <span className="aura-line font-light text-[#2B3138]">
+              <span className="orvenna-line"><span style={{ "--d": 0 }}>לגור מעל הכל.</span></span>
+              <span className="orvenna-line font-light text-[#2B3138]">
                 <span style={{ "--d": 1 }}>
-                  שני מגדלים, <span className="aura-gold font-bold">אור אחד</span>.
+                  שני מגדלים, <span className="orvenna-gold font-bold">אור אחד</span>.
                 </span>
               </span>
             </h1>
@@ -1694,7 +1694,7 @@ export default function AuraTowers() {
               148 דירות בלבד ב־34 קומות, חיפוי אבן טבעית ואלומיניום אדריכלי, נוף פתוח לים ולובי בניהול מלונאי.
             </p>
             <div data-intro style={{ "--d": 4 }} className="mt-9 flex flex-wrap items-center gap-3">
-              <a href="#quiz" className={`${ctaClass} aura-cta`}>
+              <a href="#quiz" className={`${ctaClass} orvenna-cta`}>
                 קבלו הצעת מחיר אישית <ChevronLeft className="h-4 w-4" />
               </a>
               <a href="#units" className={ghostClass}>
@@ -1743,7 +1743,7 @@ export default function AuraTowers() {
 
       {/* Architectural word band, slides sideways with scroll */}
       <div aria-hidden="true" className="pointer-events-none select-none overflow-hidden border-t border-[#DDD6CB] py-10 sm:py-14">
-        <p data-drift="0.35" dir="ltr" className="aura-outline whitespace-nowrap text-[64px] font-extrabold leading-none tracking-[0.08em] sm:text-[120px]">
+        <p data-drift="0.35" dir="ltr" className="orvenna-outline whitespace-nowrap text-[64px] font-extrabold leading-none tracking-[0.08em] sm:text-[120px]">
           ORVENNA TOWERS · HERZLIYA PITUACH · ORVENNA TOWERS · HERZLIYA PITUACH
         </p>
         <p data-drift="-0.25" dir="ltr" className="mt-2 whitespace-nowrap text-[28px] font-light leading-none tracking-[0.4em] text-[#9A7B4F]/70 sm:text-[44px]">
@@ -1789,7 +1789,7 @@ export default function AuraTowers() {
             <div className="flex flex-wrap items-center gap-3">
               <a
                 href="#quiz"
-                className="aura-shine inline-flex items-center justify-center gap-2 rounded-full bg-[#F7F5F1] px-7 py-3.5 text-[15px] font-bold text-[#0F1B2D] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] transition hover:-translate-y-0.5 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A86E]"
+                className="orvenna-shine inline-flex items-center justify-center gap-2 rounded-full bg-[#F7F5F1] px-7 py-3.5 text-[15px] font-bold text-[#0F1B2D] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)] transition hover:-translate-y-0.5 hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#C9A86E]"
               >
                 <CalendarCheck className="h-4 w-4" /> תיאום סיור פרטי
               </a>

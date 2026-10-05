@@ -1,10 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import AuraTowers from "./AuraTowers.jsx";
+import OrvennaTowers from "./OrvennaTowers.jsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AuraTowers />
+    <OrvennaTowers />
   </React.StrictMode>
 );
