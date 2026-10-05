@@ -35,7 +35,7 @@ import {
 } from "lucide-react";
 
 /*
-  Aura Towers – Luxury residential landing page
+  Orvenna Towers – Luxury residential landing page
   React + Tailwind CSS + lucide-react. Hebrew, RTL.
   Font: Assistant (Google Fonts), loaded in index.html.
   Palette: warm stone / off-white ground, dark aluminium, deep navy, matte bronze (accents only).
@@ -290,12 +290,12 @@ function TrustBadge({ size = 148 }) {
         <text fill="#0F1B2D" fontSize="10.5" fontWeight="400" fontFamily="Assistant, sans-serif">
           {/* One pass stretched to the full circumference (2π·78 ≈ 490) so the loop is seamless */}
           <textPath href="#aura-badge-circle" startOffset="0" textLength="486" lengthAdjust="spacing">
-            • AURA TOWERS • ARCHITECTURAL MASTERPIECE • HERZLIYA PITUACH
+            • ORVENNA TOWERS • ARCHITECTURAL MASTERPIECE • HERZLIYA PITUACH
           </textPath>
         </text>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-[22px] font-light leading-none tracking-[0.12em] text-[#0F1B2D]">AT</span>
+        <span className="text-[22px] font-light leading-none tracking-[0.12em] text-[#0F1B2D]">OT</span>
         <span className="mt-1.5 h-px w-8 bg-[#9A7B4F]" />
         <span className="mt-1.5 text-[8.5px] font-normal tracking-[0.32em] text-[#2B3138]">EST. 2026</span>
       </div>
@@ -1051,7 +1051,7 @@ function LeadQuiz({ presetRooms }) {
                       onChange={(e) => set("consent", e.target.checked)}
                       className="mt-1 h-4 w-4 accent-[#0F1B2D]"
                     />
-                    אני מאשר/ת ליצור איתי קשר בנוגע לפרויקט Aura Towers
+                    אני מאשר/ת ליצור איתי קשר בנוגע לפרויקט Orvenna Towers
                   </label>
                 </fieldset>
               )}
@@ -1091,7 +1091,7 @@ const LEGAL = {
       {
         h: "כללי",
         p: [
-          "אתר Aura Towers (להלן: \"האתר\") מופעל לצורך הצגת פרויקט המגורים Aura Towers. השימוש באתר כפוף לתנאים המפורטים להלן, והגלישה בו מהווה הסכמה להם.",
+          "אתר Orvenna Towers (להלן: \"האתר\") מופעל לצורך הצגת פרויקט המגורים Orvenna Towers. השימוש באתר כפוף לתנאים המפורטים להלן, והגלישה בו מהווה הסכמה להם.",
           "התקנון מנוסח בלשון רבים מטעמי נוחות בלבד, והוא מתייחס לכל המגדרים.",
         ],
       },
@@ -1155,7 +1155,7 @@ const LEGAL = {
         h: "הזכויות שלכם",
         p: [
           "אתם רשאים לעיין במידע עליכם, לבקש לתקן או למחוק אותו, להתנגד לעיבוד או לבטל הסכמה. GDPR מקנה גם זכות לניידות מידע ולהגשת תלונה לרשות פיקוח.",
-          "פניות בנושא פרטיות: privacy@auratowers.example. נשיב תוך 30 ימים.",
+          "פניות בנושא פרטיות: privacy@orvennatowers.example. נשיב תוך 30 ימים.",
         ],
       },
     ],
@@ -1188,7 +1188,7 @@ const LEGAL = {
       {
         h: "רכז/ת נגישות",
         p: [
-          "נתקלתם בבעיית נגישות? נשמח לשמוע ולתקן. דוא״ל: accessibility@auratowers.example, טלפון: ‎*5520.",
+          "נתקלתם בבעיית נגישות? נשמח לשמוע ולתקן. דוא״ל: accessibility@orvennatowers.example, טלפון: ‎*5520.",
           "הצהרה זו עודכנה לאחרונה באוקטובר 2026.",
         ],
       },
@@ -1227,7 +1227,7 @@ function LegalDialog({ docKey, onClose }) {
       >
         <div className="flex items-start justify-between gap-4 border-b border-[#ECE7DF] px-6 py-5 sm:px-8">
           <div>
-            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#7A5F38]">Aura Towers · מסמך משפטי</p>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#7A5F38]">Orvenna Towers · מסמך משפטי</p>
             <h2 id="legal-title" className="mt-1 text-2xl font-bold text-[#0F1B2D]">
               {doc.title}
             </h2>
@@ -1634,7 +1634,7 @@ export default function AuraTowers() {
           <a href="#top" className="flex items-center gap-2.5">
             <Building2 className="h-6 w-6 text-[#0F1B2D]" strokeWidth={1.5} />
             <span className="text-[17px] font-extrabold tracking-[0.22em] text-[#0F1B2D]" dir="ltr">
-              AURA TOWERS
+              ORVENNA TOWERS
             </span>
           </a>
           <nav className="hidden items-center gap-8 text-[15px] font-medium text-[#2B3138] md:flex">
@@ -1671,7 +1671,7 @@ export default function AuraTowers() {
       {/* Brand band under the header, drifts sideways with scroll */}
       <div aria-hidden="true" className="pointer-events-none select-none overflow-hidden pt-6 sm:pt-8">
         <p data-drift="-0.5" dir="ltr" className="aura-outline aura-outline-soft whitespace-nowrap text-[52px] font-extrabold leading-none tracking-[0.08em] sm:text-[96px]">
-          AURA TOWERS · HERZLIYA PITUACH · AURA TOWERS · HERZLIYA PITUACH · AURA TOWERS
+          ORVENNA TOWERS · HERZLIYA PITUACH · ORVENNA TOWERS · HERZLIYA PITUACH · ORVENNA TOWERS
         </p>
       </div>
 
@@ -1744,7 +1744,7 @@ export default function AuraTowers() {
       {/* Architectural word band, slides sideways with scroll */}
       <div aria-hidden="true" className="pointer-events-none select-none overflow-hidden border-t border-[#DDD6CB] py-10 sm:py-14">
         <p data-drift="0.35" dir="ltr" className="aura-outline whitespace-nowrap text-[64px] font-extrabold leading-none tracking-[0.08em] sm:text-[120px]">
-          AURA TOWERS · HERZLIYA PITUACH · AURA TOWERS · HERZLIYA PITUACH
+          ORVENNA TOWERS · HERZLIYA PITUACH · ORVENNA TOWERS · HERZLIYA PITUACH
         </p>
         <p data-drift="-0.25" dir="ltr" className="mt-2 whitespace-nowrap text-[28px] font-light leading-none tracking-[0.4em] text-[#9A7B4F]/70 sm:text-[44px]">
           STONE · GLASS · BRASS · LIGHT · STONE · GLASS · BRASS · LIGHT · STONE · GLASS · BRASS
@@ -1813,7 +1813,7 @@ export default function AuraTowers() {
         <div className="mx-auto flex max-w-6xl flex-col gap-10 md:flex-row md:items-end md:justify-between">
           <div>
             <p className="text-[17px] font-extrabold tracking-[0.22em] text-white" dir="ltr">
-              AURA TOWERS
+              ORVENNA TOWERS
             </p>
             <p className="mt-3 max-w-sm font-light leading-relaxed">
               משרד מכירות: שדרות הים 12, הרצליה פיתוח. א׳–ה׳ 10:00–19:00, ו׳ 9:00–13:00.
@@ -1852,7 +1852,7 @@ export default function AuraTowers() {
               <Cookie className="h-3.5 w-3.5 text-[#C9A86E]" /> הגדרות עוגיות
             </button>
           </nav>
-          <p className="text-[13px] text-[#8D96A3]">ההדמיות והנתונים להמחשה בלבד. © 2026 Aura Towers</p>
+          <p className="text-[13px] text-[#8D96A3]">ההדמיות והנתונים להמחשה בלבד. © 2026 Orvenna Towers</p>
         </div>
       </footer>
       </div>
